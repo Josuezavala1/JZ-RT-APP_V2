@@ -430,6 +430,40 @@
     updateAll();
   }
 
+  function rerenderShotCardsPreserveFocus(activeInput) {
+    const shouldRestoreFocus =
+      activeInput &&
+      activeInput.matches('[data-shot-field="shotId"], [data-shot-field="pdd"], [data-shot-field="spd"]');
+
+    const focusState = shouldRestoreFocus
+      ? {
+          shotId: activeInput.getAttribute("data-shot-id"),
+          shotField: activeInput.getAttribute("data-shot-field"),
+          selectionStart: activeInput.selectionStart,
+          selectionEnd: activeInput.selectionEnd,
+        }
+      : null;
+
+    renderShots();
+
+    if (!focusState || !focusState.shotId || !focusState.shotField) {
+      return;
+    }
+
+    const restoredInput = dom.shotCardsContainer.querySelector(
+      `[data-shot-id="${focusState.shotId}"][data-shot-field="${focusState.shotField}"]`
+    );
+
+    if (!restoredInput) {
+      return;
+    }
+
+    restoredInput.focus();
+    if (typeof focusState.selectionStart === "number" && typeof focusState.selectionEnd === "number") {
+      restoredInput.setSelectionRange(focusState.selectionStart, focusState.selectionEnd);
+    }
+  }
+
   function onContainerChange(event) {
     const layerId = event.target.getAttribute("data-layer-id");
     const layerField = event.target.getAttribute("data-layer-field");
@@ -448,6 +482,7 @@
       const shot = shotCards.find((item) => item.id === shotId);
       if (shot) {
         shot[shotField] = event.target.value;
+        rerenderShotCardsPreserveFocus(event.target);
         updateAll();
       }
     }
