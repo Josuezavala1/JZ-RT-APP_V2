@@ -288,9 +288,9 @@
             ${isShotIdMissing(shot) ? '<div class="field-required-inline">Required</div>' : ""}
           </div>
           <label>PDD (Pipe-Detector Distance) (in)</label>
-          <input type="number" min="0" step="0.001" data-shot-field="pdd" data-shot-id="${shot.id}" value="${shot.pdd}" />
+          <input type="text" inputmode="decimal" min="0" step="0.001" data-shot-field="pdd" data-shot-id="${shot.id}" value="${shot.pdd}" />
           <label>SPD (Source-Pipe Distance) (in)</label>
-          <input type="number" min="0" step="0.001" data-shot-field="spd" data-shot-id="${shot.id}" value="${shot.spd}" />
+          <input type="text" inputmode="decimal" min="0" step="0.001" data-shot-field="spd" data-shot-id="${shot.id}" value="${shot.spd}" />
         </div>
         <div class="result-grid">
           <div class="result-item"><strong>Computed UG:</strong> ${result.ug.toFixed(4)}</div>
