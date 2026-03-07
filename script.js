@@ -401,8 +401,6 @@
     dom.distanceEmergency.textContent = `${getEmergencyDistance(2).toFixed(1)} ft`;
     dom.exposureTime.textContent = `${getExposureMinutes().toFixed(1)} minutes`;
 
-    renderLayers();
-    renderShots();
     renderWarnings();
     if (dom.generatePdfButton) {
       dom.generatePdfButton.disabled = hasMissingShotId;
@@ -417,6 +415,7 @@
       thickness: 0,
       hvlCount: 0,
     });
+    renderLayers();
     updateAll();
   }
 
@@ -427,6 +426,7 @@
       pdd: 0,
       spd: 0,
     });
+    renderShots();
     updateAll();
   }
 
@@ -457,6 +457,7 @@
     const removeLayerId = event.target.getAttribute("data-remove-layer");
     if (removeLayerId) {
       materialLayers = materialLayers.filter((layer) => layer.id !== removeLayerId);
+      renderLayers();
       updateAll();
       return;
     }
@@ -464,6 +465,7 @@
     const removeShotId = event.target.getAttribute("data-remove-shot");
     if (removeShotId) {
       shotCards = shotCards.filter((shot) => shot.id !== removeShotId);
+      renderShots();
       updateAll();
     }
   }
@@ -550,6 +552,13 @@
   }
 
   loadState();
+
+  if (materialLayers.length) {
+    renderLayers();
+  }
+  if (shotCards.length) {
+    renderShots();
+  }
 
   if (!materialLayers.length) {
     addMaterialLayer();
