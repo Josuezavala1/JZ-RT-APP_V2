@@ -431,16 +431,22 @@
   }
 
   function rerenderShotCardsPreserveFocus(activeInput) {
-    const shouldRestoreFocus =
+    const isSection5Field =
       activeInput &&
       activeInput.matches('[data-shot-field="shotId"], [data-shot-field="pdd"], [data-shot-field="spd"]');
+
+    const cursorStart = isSection5Field ? activeInput.selectionStart : null;
+    const cursorEnd = isSection5Field ? activeInput.selectionEnd : null;
+
+    const shouldRestoreFocus =
+      isSection5Field;
 
     const focusState = shouldRestoreFocus
       ? {
           shotId: activeInput.getAttribute("data-shot-id"),
           shotField: activeInput.getAttribute("data-shot-field"),
-          selectionStart: activeInput.selectionStart,
-          selectionEnd: activeInput.selectionEnd,
+          selectionStart: cursorStart,
+          selectionEnd: cursorEnd,
         }
       : null;
 
@@ -459,9 +465,11 @@
     }
 
     restoredInput.focus();
-    if (typeof focusState.selectionStart === "number" && typeof focusState.selectionEnd === "number") {
-      restoredInput.setSelectionRange(focusState.selectionStart, focusState.selectionEnd);
-    }
+    requestAnimationFrame(() => {
+      if (typeof focusState.selectionStart === "number" && typeof focusState.selectionEnd === "number") {
+        restoredInput.setSelectionRange(focusState.selectionStart, focusState.selectionEnd);
+      }
+    });
   }
 
   function onContainerChange(event) {
