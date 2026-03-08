@@ -45,6 +45,8 @@ body {
   background-color: rgb(0, 102, 204);
   color: white;
   text-align: center;
+  padding: 16px;
+  border-radius: 8px;
 }
 
 .page-title-card h1 {
