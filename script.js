@@ -291,6 +291,8 @@
           <input type="text" inputmode="decimal" min="0" step="0.001" data-shot-field="pdd" data-shot-id="${shot.id}" value="${shot.pdd}" />
           <label>SPD (Source-Pipe Distance) (in)</label>
           <input type="text" inputmode="decimal" min="0" step="0.001" data-shot-field="spd" data-shot-id="${shot.id}" value="${shot.spd}" />
+          <label>Figure</label>
+          <input type="text" data-shot-field="figure" data-shot-id="${shot.id}" value="${shot.figure || ""}" />
         </div>
         <div class="result-grid">
           <div class="result-item"><strong>Computed UG:</strong> ${result.ug.toFixed(4)}</div>
@@ -374,6 +376,7 @@
             ...shot,
             shotId: shot.shotId || "",
             spd: shot.spd ?? 0,
+            figure: shot.figure || "",
           }))
         : [];
       dom.exposureDistance.value = state.exposureDistance || 0;
@@ -425,6 +428,7 @@
       shotId: "",
       pdd: 0,
       spd: 0,
+      figure: "",
     });
     renderShots();
     updateAll();
@@ -433,7 +437,7 @@
   function rerenderShotCardsPreserveFocus(activeInput) {
     const isSection5Field =
       activeInput &&
-      activeInput.matches('[data-shot-field="shotId"], [data-shot-field="pdd"], [data-shot-field="spd"]');
+      activeInput.matches('[data-shot-field="shotId"], [data-shot-field="pdd"], [data-shot-field="spd"], [data-shot-field="figure"]');
 
     const cursorStart = isSection5Field ? activeInput.selectionStart : null;
     const cursorEnd = isSection5Field ? activeInput.selectionEnd : null;
@@ -533,7 +537,7 @@
 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(14);
-    line("RT Shot & Safety Calculator v2 Report", 22);
+    line("Digital Shoot Sheet", 22);
     pdf.setFontSize(10);
 
     pdf.setFont("helvetica", "bold");
@@ -580,6 +584,7 @@
       shotCards.forEach((shot, index) => {
         const result = getShotResult(shot);
         line(`Shot ${index + 1}: Shot ID / Location ${shot.shotId || "-"}`);
+        line(`  Figure: ${String(shot.figure || "").trim() || "-"}`);
         line(`  PDD ${Number(shot.pdd || 0).toFixed(3)} in | SPD ${Number(shot.spd || 0).toFixed(3)} in`);
         line(`  UG ${result.ug.toFixed(4)} | Mag ${result.magnification.toFixed(4)} | Blow-up ${result.blowUpPercent.toFixed(1)}%`);
         line(`  Req SPD (UG): ${result.requiredSpdForUg.toFixed(3)} in | Req SPD (20%): ${result.requiredSpdForBlowUp.toFixed(3)} in | Req SPD Final: ${result.requiredSpdFinal.toFixed(3)} in`);
