@@ -546,9 +546,19 @@
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ unit: "pt", format: "letter" });
     let y = 40;
+    const pageBottom = 752;
+    const marginX = 40;
+    const contentWidth = 532;
+
+    function ensureSpace(requiredHeight) {
+      if (y + requiredHeight > pageBottom) {
+        pdf.addPage();
+        y = 40;
+      }
+    }
 
     function line(text, gap = 16) {
-      pdf.text(text, 40, y);
+      pdf.text(text, marginX, y);
       y += gap;
       if (y > 740) {
         pdf.addPage();
@@ -556,67 +566,96 @@
       }
     }
 
+    function drawSection(title, rows) {
+      const rowGap = 14;
+      const paddingTop = 14;
+      const paddingBottom = 12;
+      const headerHeight = 20;
+      const textHeight = rows.length * rowGap;
+      const sectionHeight = paddingTop + headerHeight + textHeight + paddingBottom;
+
+      ensureSpace(sectionHeight + 12);
+
+      pdf.setDrawColor(90, 90, 90);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(marginX, y, contentWidth, sectionHeight, 4, 4);
+
+      pdf.setFillColor(240, 240, 240);
+      pdf.rect(marginX + 1, y + 1, contentWidth - 2, headerHeight, "F");
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(11);
+      pdf.text(title, marginX + 10, y + 15);
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
+      let rowY = y + paddingTop + headerHeight + 12;
+
+      rows.forEach((row) => {
+        pdf.text(row, marginX + 10, rowY);
+        rowY += rowGap;
+      });
+
+      y += sectionHeight + 12;
+    }
+
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(14);
-    line("Digital Shoot Sheet", 22);
+    pdf.setFontSize(16);
+    line("Digital Shooter Sheet", 24);
     pdf.setFontSize(10);
 
-    pdf.setFont("helvetica", "bold");
-    line("Section 1 — Job Information");
-    pdf.setFont("helvetica", "normal");
-    line(`Unit / Site: ${dom.unitSite.value || "-"}`);
-    line(`Date: ${dom.jobDate.value || "-"}`);
-    line(`Drawing Number: ${dom.drawingNumber.value || "-"}`);
-    line(`Technician: ${dom.technician.value || "-"}`);
+    drawSection("Section 1 — Job Information", [
+      `Unit / Site: ${dom.unitSite.value || "-"}`,
+      `Date: ${dom.jobDate.value || "-"}`,
+      `Drawing Number: ${dom.drawingNumber.value || "-"}`,
+      `Technician: ${dom.technician.value || "-"}`,
+    ]);
 
-    pdf.setFont("helvetica", "bold");
-    line("Section 2 — Source Information");
-    pdf.setFont("helvetica", "normal");
-    line(`Isotope: ${dom.isotope.value}`);
-    line(`Constant (mR/hr per Ci @ 1 ft): ${ISOTOPE_CONSTANTS[dom.isotope.value]}`);
-    line(`Focus Spot (d): ${dom.focusSpot.value || "0"}`);
-    line(`Source Activity (Ci): ${dom.sourceActivity.value || "0"}`);
+    drawSection("Section 2 — Source Information", [
+      `Isotope: ${dom.isotope.value}`,
+      `Constant (mR/hr per Ci @ 1 ft): ${ISOTOPE_CONSTANTS[dom.isotope.value]}`,
+      `Focus Spot (d): ${dom.focusSpot.value || "0"}`,
+      `Source Activity (Ci): ${dom.sourceActivity.value || "0"}`,
+    ]);
 
-    pdf.setFont("helvetica", "bold");
-    line("Section 3 — Boundary Distances");
-    pdf.setFont("helvetica", "normal");
-    line(`Time Fraction: ${getTimeFraction().toFixed(4)}`);
-    line(`2 mR/hr Boundary: ${getBoundaryDistance(2).toFixed(1)} ft`);
-    line(`100 mR/hr Boundary: ${getBoundaryDistance(100).toFixed(1)} ft`);
+    drawSection("Section 3 — Boundary Distances", [
+      `Time Fraction: ${getTimeFraction().toFixed(4)}`,
+      `2 mR/hr Boundary: ${getBoundaryDistance(2).toFixed(1)} ft`,
+      `100 mR/hr Boundary: ${getBoundaryDistance(100).toFixed(1)} ft`,
+    ]);
 
-    pdf.setFont("helvetica", "bold");
-    line("Section 4 — Material Layers");
-    pdf.setFont("helvetica", "normal");
-    if (materialLayers.length === 0) {
-      line("No material layers entered.");
-    } else {
-      materialLayers.forEach((layer, index) => {
-        line(`Layer ${index + 1}: ${layer.material}, Thickness ${layer.thickness} in, HVL ${layer.hvlCount}`);
-      });
-    }
-    line(`Total attenuation factor: ${getAttenuationFactor().toFixed(6)}`);
+    const materialRows = materialLayers.length
+      ? materialLayers.map(
+          (layer, index) =>
+            `Layer ${index + 1}: ${layer.material}, Thickness ${layer.thickness} in, HVL ${layer.hvlCount}`
+        )
+      : ["No material layers entered."];
+    materialRows.push(`Total attenuation factor: ${getAttenuationFactor().toFixed(6)}`);
+    drawSection("Section 4 — Material Layers", materialRows);
 
-    pdf.setFont("helvetica", "bold");
-    line("Section 5 — Shot Cards");
-    pdf.setFont("helvetica", "normal");
     if (shotCards.length === 0) {
-      line("No shots entered.");
+      drawSection("Section 5 — Shot Cards", ["No shots entered."]);
     } else {
       shotCards.forEach((shot, index) => {
         const result = getShotResult(shot);
-        line(`Shot ${index + 1} / ${shot.shotId || "-"}`);
-        line(`  Figure: ${String(shot.figure || "").trim() || "-"}`);
-        line(`  Criteria: ${getFigureCriteria(shot.figure)}`);
-        line(`  PDD ${Number(shot.pdd || 0).toFixed(3)} in | SPD ${Number(shot.spd || 0).toFixed(3)} in`);
-        line(`  UG ${result.ug.toFixed(4)} | Mag ${result.magnification.toFixed(4)} | Blow-up ${result.blowUpPercent.toFixed(1)}%`);
-        line(`  Req SPD (UG): ${result.requiredSpdForUg.toFixed(3)} in | Req SPD (20%): ${result.requiredSpdForBlowUp.toFixed(3)} in | Req SPD Final: ${result.requiredSpdFinal.toFixed(3)} in`);
+        const shotStatus = result.ug > 0.024 ? "FAIL" : "PASS";
+
+        drawSection(`Section 5 — Shot ${index + 1}`, [
+          `Shot number: ${index + 1}`,
+          `Shot ID / Location: ${shot.shotId || "-"}`,
+          `Figure: ${String(shot.figure || "").trim() || "-"}`,
+          `Figure criteria: ${getFigureCriteria(shot.figure)}`,
+          `PDD: ${Number(shot.pdd || 0).toFixed(3)} in`,
+          `SPD: ${Number(shot.spd || 0).toFixed(3)} in`,
+          `UG: ${result.ug.toFixed(4)}`,
+          `Required Multiplier: ${result.requiredMultiplier > 0 ? `${result.requiredMultiplier}×` : "-"}`,
+          `Recommended SPD: ${result.recommendedSpd.toFixed(3)} in`,
+          `PASS / FAIL: ${shotStatus}`,
+        ]);
       });
     }
 
-    pdf.setFont("helvetica", "bold");
-    line("Section 6 — Exposure Time");
-    pdf.setFont("helvetica", "normal");
-    line(`Estimated exposure time: ${getExposureMinutes().toFixed(1)} minutes`);
+    drawSection("Section 6 — Exposure Time", [`Estimated exposure time: ${getExposureMinutes().toFixed(1)} minutes`]);
 
     pdf.save("RT_Shot_Safety_Report_v2.pdf");
   }
