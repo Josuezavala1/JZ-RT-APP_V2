@@ -583,7 +583,7 @@
     } else {
       shotCards.forEach((shot, index) => {
         const result = getShotResult(shot);
-        line(`Shot ${index + 1}: Shot ID / Location ${shot.shotId || "-"}`);
+        line(`Shot ${index + 1} / ${shot.shotId || "-"}`);
         line(`  Figure: ${String(shot.figure || "").trim() || "-"}`);
         line(`  PDD ${Number(shot.pdd || 0).toFixed(3)} in | SPD ${Number(shot.spd || 0).toFixed(3)} in`);
         line(`  UG ${result.ug.toFixed(4)} | Mag ${result.magnification.toFixed(4)} | Blow-up ${result.blowUpPercent.toFixed(1)}%`);
