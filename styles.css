@@ -205,3 +205,11 @@ select:focus {
   font-size: 0.84rem;
   color: var(--muted);
 }
+
+.app-footer {
+  text-align: center;
+  font-size: 0.78rem;
+  color: #6b7280;
+  padding: 0.35rem 1rem 1.2rem;
+}
+

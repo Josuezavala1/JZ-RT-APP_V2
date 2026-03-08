@@ -658,9 +658,18 @@
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ unit: "pt", format: "letter" });
     let y = 40;
-    const pageBottom = 752;
+    const pageBottom = 730;
     const marginX = 40;
     const contentWidth = 532;
+
+    function drawPdfFooter() {
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9);
+      pdf.setTextColor(110, 110, 110);
+      pdf.text("Powered by UWC", pageWidth / 2, pageHeight - 20, { align: "center" });
+    }
 
     function decodeCriteriaForPdf(text) {
       return String(text || "")
@@ -674,6 +683,7 @@
 
     function ensureSpace(requiredHeight) {
       if (y + requiredHeight > pageBottom) {
+        drawPdfFooter();
         pdf.addPage();
         y = 40;
       }
@@ -682,7 +692,8 @@
     function line(text, gap = 16) {
       pdf.text(text, marginX, y);
       y += gap;
-      if (y > 740) {
+      if (y > pageBottom) {
+        drawPdfFooter();
         pdf.addPage();
         y = 40;
       }
@@ -783,6 +794,7 @@
 
     drawSection("Section 6 — Exposure Time", [`Estimated exposure time: ${getExposureMinutes().toFixed(1)} minutes`]);
 
+    drawPdfFooter();
     pdf.save("RT_Shot_Safety_Report_v2.pdf");
   }
 
