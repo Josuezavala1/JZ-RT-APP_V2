@@ -693,7 +693,9 @@
       const paddingTop = 14;
       const paddingBottom = 12;
       const headerHeight = 20;
-      const textHeight = rows.length * rowGap;
+      const maxTextWidth = contentWidth - 20;
+      const wrappedRows = rows.map((row) => pdf.splitTextToSize(row, maxTextWidth));
+      const textHeight = wrappedRows.reduce((height, wrappedRow) => height + wrappedRow.length * rowGap, 0);
       const sectionHeight = paddingTop + headerHeight + textHeight + paddingBottom;
 
       ensureSpace(sectionHeight + 12);
@@ -702,20 +704,22 @@
       pdf.setLineWidth(1);
       pdf.roundedRect(marginX, y, contentWidth, sectionHeight, 4, 4);
 
-      pdf.setFillColor(240, 240, 240);
+      pdf.setFillColor(0, 102, 204);
       pdf.rect(marginX + 1, y + 1, contentWidth - 2, headerHeight, "F");
 
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(11);
+      pdf.setTextColor(255, 255, 255);
       pdf.text(title, marginX + 10, y + 15);
 
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(10);
+      pdf.setTextColor(0, 0, 0);
       let rowY = y + paddingTop + headerHeight + 12;
 
-      rows.forEach((row) => {
-        pdf.text(row, marginX + 10, rowY);
-        rowY += rowGap;
+      wrappedRows.forEach((wrappedRow) => {
+        pdf.text(wrappedRow, marginX + 10, rowY);
+        rowY += wrappedRow.length * rowGap;
       });
 
       y += sectionHeight + 12;
