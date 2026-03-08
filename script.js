@@ -410,6 +410,8 @@
             <input type="text" data-shot-field="shotId" data-shot-id="${shot.id}" value="${shot.shotId || ""}" />
             ${isShotIdMissing(shot) ? '<div class="field-required-inline">Required</div>' : ""}
           </div>
+          <label>Shot Time</label>
+          <input type="time" data-shot-field="shotTime" data-shot-id="${shot.id}" value="${shot.shotTime || ""}" />
           <label>PDD (Pipe-Detector Distance) (in)</label>
           <input type="text" inputmode="decimal" min="0" step="0.001" data-shot-field="pdd" data-shot-id="${shot.id}" value="${shot.pdd}" />
           <label>SPD (Source-Pipe Distance) (in)</label>
@@ -508,6 +510,7 @@
         ? state.shots.map((shot) => ({
             ...shot,
             shotId: shot.shotId || "",
+            shotTime: shot.shotTime || "",
             spd: shot.spd ?? 0,
             figure: shot.figure || "",
           }))
@@ -559,6 +562,7 @@
     shotCards.push({
       id: crypto.randomUUID(),
       shotId: "",
+      shotTime: "",
       pdd: 0,
       spd: 0,
       figure: "",
@@ -570,7 +574,7 @@
   function rerenderShotCardsPreserveFocus(activeInput) {
     const isSection5Field =
       activeInput &&
-      activeInput.matches('[data-shot-field="shotId"], [data-shot-field="pdd"], [data-shot-field="spd"], [data-shot-field="figure"]');
+      activeInput.matches('[data-shot-field="shotId"], [data-shot-field="shotTime"], [data-shot-field="pdd"], [data-shot-field="spd"], [data-shot-field="figure"]');
 
     const cursorStart = isSection5Field ? activeInput.selectionStart : null;
     const cursorEnd = isSection5Field ? activeInput.selectionEnd : null;
@@ -780,6 +784,7 @@
         drawSection(`Section 5 — Shot ${index + 1}`, [
           `Shot number: ${index + 1}`,
           `Shot ID / Location: ${shot.shotId || "-"}`,
+          `Shot Time: ${shot.shotTime || "-"}`,
           `Figure: ${String(shot.figure || "").trim() || "-"}`,
           `Figure criteria: ${decodeCriteriaForPdf(getFigureCriteria(shot.figure))}`,
           `PDD: ${Number(shot.pdd || 0).toFixed(3)} in`,
