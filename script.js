@@ -657,17 +657,30 @@
 
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ unit: "pt", format: "letter" });
-    let y = 40;
+    let y = 72;
     const pageBottom = 730;
     const marginX = 40;
     const contentWidth = 532;
 
-    function drawPdfFooter() {
+    function drawPdfHeader() {
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(16);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text("Digital Shooter Sheet", pageWidth / 2, 30, { align: "center" });
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
+      pdf.text("Rev.1", pageWidth / 2, 46, { align: "center" });
+    }
+
+    function drawPdfFooter(pageNumber, totalPages) {
       const pageHeight = pdf.internal.pageSize.getHeight();
       const pageWidth = pdf.internal.pageSize.getWidth();
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(9);
       pdf.setTextColor(110, 110, 110);
+      pdf.text(`Page ${pageNumber} of ${totalPages}`, pageWidth / 2, pageHeight - 30, { align: "center" });
       pdf.text("Powered by UWC", pageWidth / 2, pageHeight - 20, { align: "center" });
     }
 
@@ -683,19 +696,9 @@
 
     function ensureSpace(requiredHeight) {
       if (y + requiredHeight > pageBottom) {
-        drawPdfFooter();
         pdf.addPage();
-        y = 40;
-      }
-    }
-
-    function line(text, gap = 16) {
-      pdf.text(text, marginX, y);
-      y += gap;
-      if (y > pageBottom) {
-        drawPdfFooter();
-        pdf.addPage();
-        y = 40;
+        drawPdfHeader();
+        y = 72;
       }
     }
 
@@ -736,10 +739,7 @@
       y += sectionHeight + 12;
     }
 
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(16);
-    line("Digital Shooter Sheet", 24);
-    pdf.setFontSize(10);
+    drawPdfHeader();
 
     drawSection("Section 1 — Job Information", [
       `Unit / Site: ${dom.unitSite.value || "-"}`,
@@ -794,7 +794,12 @@
 
     drawSection("Section 6 — Exposure Time", [`Estimated exposure time: ${getExposureMinutes().toFixed(1)} minutes`]);
 
-    drawPdfFooter();
+    const totalPages = pdf.getNumberOfPages();
+    for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
+      pdf.setPage(pageNumber);
+      drawPdfFooter(pageNumber, totalPages);
+    }
+
     pdf.save("RT_Shot_Safety_Report_v2.pdf");
   }
 
