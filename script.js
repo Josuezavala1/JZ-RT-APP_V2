@@ -7,6 +7,13 @@
   };
 
   const STORAGE_KEY = "rt-shot-safety-v2-state";
+  const FIGURE_CRITERIA = {
+    "1": "Max accuracy",
+    "2": ">4″ up to 6″ pipe, ≤1.5″ insulation",
+    "3": "≤3″ pipe or ≤1.5″ insulation",
+    "4": ">6″ pipe or >1.5″ insulation",
+    "5": "≤6″ pipe and ≤1.5″ insulation",
+  };
 
   const dom = {
     unitSite: document.getElementById("unitSite"),
@@ -199,6 +206,10 @@
     };
   }
 
+  function getFigureCriteria(figure) {
+    return FIGURE_CRITERIA[String(figure || "").trim()] || "-";
+  }
+
   function isShotIdMissing(shot) {
     return !String(shot.shotId || "").trim();
   }
@@ -292,7 +303,17 @@
           <label>SPD (Source-Pipe Distance) (in)</label>
           <input type="text" inputmode="decimal" min="0" step="0.001" data-shot-field="spd" data-shot-id="${shot.id}" value="${shot.spd}" />
           <label>Figure</label>
-          <input type="text" data-shot-field="figure" data-shot-id="${shot.id}" value="${shot.figure || ""}" />
+          <div>
+            <select data-shot-field="figure" data-shot-id="${shot.id}">
+              <option value="" ${(shot.figure || "") === "" ? "selected" : ""}>Select</option>
+              <option value="1" ${shot.figure === "1" ? "selected" : ""}>1</option>
+              <option value="2" ${shot.figure === "2" ? "selected" : ""}>2</option>
+              <option value="3" ${shot.figure === "3" ? "selected" : ""}>3</option>
+              <option value="4" ${shot.figure === "4" ? "selected" : ""}>4</option>
+              <option value="5" ${shot.figure === "5" ? "selected" : ""}>5</option>
+            </select>
+            <div class="field-criteria-inline"><strong>Criteria:</strong> ${getFigureCriteria(shot.figure)}</div>
+          </div>
         </div>
         <div class="result-grid">
           <div class="result-item"><strong>Computed UG:</strong> ${result.ug.toFixed(4)}</div>
@@ -585,6 +606,7 @@
         const result = getShotResult(shot);
         line(`Shot ${index + 1} / ${shot.shotId || "-"}`);
         line(`  Figure: ${String(shot.figure || "").trim() || "-"}`);
+        line(`  Criteria: ${getFigureCriteria(shot.figure)}`);
         line(`  PDD ${Number(shot.pdd || 0).toFixed(3)} in | SPD ${Number(shot.spd || 0).toFixed(3)} in`);
         line(`  UG ${result.ug.toFixed(4)} | Mag ${result.magnification.toFixed(4)} | Blow-up ${result.blowUpPercent.toFixed(1)}%`);
         line(`  Req SPD (UG): ${result.requiredSpdForUg.toFixed(3)} in | Req SPD (20%): ${result.requiredSpdForBlowUp.toFixed(3)} in | Req SPD Final: ${result.requiredSpdFinal.toFixed(3)} in`);
