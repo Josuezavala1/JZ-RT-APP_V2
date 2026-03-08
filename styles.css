@@ -188,3 +188,9 @@ select:focus {
   opacity: 0.55;
   cursor: not-allowed;
 }
+
+.field-criteria-inline {
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
