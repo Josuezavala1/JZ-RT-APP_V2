@@ -194,3 +194,15 @@ select:focus {
   color: var(--muted);
   font-size: 0.84rem;
 }
+
+.field-figure-image-inline {
+  margin-top: 0.45rem;
+}
+
+.field-figure-image-inline img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}

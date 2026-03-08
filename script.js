@@ -15,6 +15,14 @@
     "5": "≤6″ pipe and ≤1.5″ insulation",
   };
 
+  const FIGURE_IMAGE_MAP = {
+    "1": "assets/fig1.svg",
+    "2": "assets/fig2.svg",
+    "3": "assets/fig3.svg",
+    "4": "assets/fig4.svg",
+    "5": "assets/fig5.svg",
+  };
+
   const dom = {
     unitSite: document.getElementById("unitSite"),
     jobDate: document.getElementById("jobDate"),
@@ -210,6 +218,10 @@
     return FIGURE_CRITERIA[String(figure || "").trim()] || "-";
   }
 
+  function getFigureImage(figure) {
+    return FIGURE_IMAGE_MAP[String(figure || "").trim()] || "";
+  }
+
   function isShotIdMissing(shot) {
     return !String(shot.shotId || "").trim();
   }
@@ -313,6 +325,7 @@
               <option value="5" ${shot.figure === "5" ? "selected" : ""}>5</option>
             </select>
             <div class="field-criteria-inline"><strong>Criteria:</strong> ${getFigureCriteria(shot.figure)}</div>
+            ${getFigureImage(shot.figure) ? `<div class="field-figure-image-inline"><img src="${getFigureImage(shot.figure)}" alt="Figure ${shot.figure} diagram" /></div>` : ""}
           </div>
         </div>
         <div class="result-grid">
