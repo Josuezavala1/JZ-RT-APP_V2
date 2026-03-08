@@ -563,6 +563,16 @@
     const marginX = 40;
     const contentWidth = 532;
 
+    function decodeCriteriaForPdf(text) {
+      return String(text || "")
+        .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&amp;/g, "&")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+    }
+
     function ensureSpace(requiredHeight) {
       if (y + requiredHeight > pageBottom) {
         pdf.addPage();
@@ -657,7 +667,7 @@
           `Shot number: ${index + 1}`,
           `Shot ID / Location: ${shot.shotId || "-"}`,
           `Figure: ${String(shot.figure || "").trim() || "-"}`,
-          `Figure criteria: ${getFigureCriteria(shot.figure)}`,
+          `Figure criteria: ${decodeCriteriaForPdf(getFigureCriteria(shot.figure))}`,
           `PDD: ${Number(shot.pdd || 0).toFixed(3)} in`,
           `SPD: ${Number(shot.spd || 0).toFixed(3)} in`,
           `UG: ${result.ug.toFixed(4)}`,
