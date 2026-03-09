@@ -797,8 +797,6 @@
       });
     }
 
-    drawSection("Section 6 — Exposure Time", [`Estimated exposure time: ${getExposureMinutes().toFixed(1)} minutes`]);
-
     const totalPages = pdf.getNumberOfPages();
     for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
       pdf.setPage(pageNumber);
