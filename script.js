@@ -135,6 +135,8 @@
     exposureTimeUnit: document.getElementById("exposureTimeUnit"),
     timePerExposure: document.getElementById("timePerExposure"),
     numberOfExposures: document.getElementById("numberOfExposures"),
+    useTotalExposureMinutesOverride: document.getElementById("useTotalExposureMinutesOverride"),
+    totalExposureMinutesOverrideWrapper: document.getElementById("totalExposureMinutesOverrideWrapper"),
     totalExposureMinutesOverride: document.getElementById("totalExposureMinutesOverride"),
     beamMinutesPerHour: document.getElementById("beamMinutesPerHour"),
     maxDoseAtPublic: document.getElementById("maxDoseAtPublic"),
@@ -195,15 +197,9 @@
     return getTotalExposureMinutes();
   }
 
-  function getTotalExposureMinutes() {
+  function getComputedExposureMinutesFromInputs() {
     const timePerExposureRaw = dom.timePerExposure.value;
     const numberOfExposuresRaw = dom.numberOfExposures.value;
-    const overrideRaw = dom.totalExposureMinutesOverride.value;
-
-    const overrideValue = Number(overrideRaw);
-    if (overrideRaw !== "" && Number.isFinite(overrideValue) && overrideValue >= 0) {
-      return overrideValue;
-    }
 
     if (timePerExposureRaw === "" || numberOfExposuresRaw === "") {
       return 0;
@@ -218,6 +214,21 @@
 
     const minutesPerExposure = dom.exposureTimeUnit.value === "seconds" ? timePerExposure / 60 : timePerExposure;
     return minutesPerExposure * numberOfExposures;
+  }
+
+  function isManualOverrideEnabled() {
+    return Boolean(dom.useTotalExposureMinutesOverride && dom.useTotalExposureMinutesOverride.checked);
+  }
+
+  function getTotalExposureMinutes() {
+    const overrideRaw = dom.totalExposureMinutesOverride.value;
+    const overrideValue = Number(overrideRaw);
+
+    if (isManualOverrideEnabled() && overrideRaw !== "" && Number.isFinite(overrideValue) && overrideValue >= 0) {
+      return overrideValue;
+    }
+
+    return getComputedExposureMinutesFromInputs();
   }
 
   function getDistanceWithoutShield(limit = 2) {
@@ -479,6 +490,7 @@
       exposureTimeUnit: dom.exposureTimeUnit.value,
       timePerExposure: dom.timePerExposure.value,
       numberOfExposures: dom.numberOfExposures.value,
+      useTotalExposureMinutesOverride: isManualOverrideEnabled(),
       totalExposureMinutesOverride: dom.totalExposureMinutesOverride.value,
       layers: materialLayers,
       shots: shotCards,
@@ -504,6 +516,9 @@
       dom.exposureTimeUnit.value = state.exposureTimeUnit || "minutes";
       dom.timePerExposure.value = state.timePerExposure || state.minutesPerExposure || ((Number(state.secondsPerExposure) || 0) / 60);
       dom.numberOfExposures.value = state.numberOfExposures || state.exposuresPerHour || 0;
+      if (dom.useTotalExposureMinutesOverride) {
+        dom.useTotalExposureMinutesOverride.checked = Boolean(state.useTotalExposureMinutesOverride);
+      }
       dom.totalExposureMinutesOverride.value = state.totalExposureMinutesOverride || "";
       materialLayers = Array.isArray(state.layers) ? state.layers : [];
       shotCards = Array.isArray(state.shots)
@@ -526,6 +541,10 @@
     const hasMissingShotId = shotCards.some((shot) => isShotIdMissing(shot));
 
     dom.isotopeConstant.value = ISOTOPE_CONSTANTS[dom.isotope.value];
+
+    if (dom.totalExposureMinutesOverrideWrapper) {
+      dom.totalExposureMinutesOverrideWrapper.style.display = isManualOverrideEnabled() ? "block" : "none";
+    }
 
     const timeFraction = getTimeFraction();
     dom.beamMinutesPerHour.textContent = getBeamMinutesPerHour().toFixed(1);
@@ -833,6 +852,7 @@
     dom.exposureTimeUnit,
     dom.timePerExposure,
     dom.numberOfExposures,
+    dom.useTotalExposureMinutesOverride,
     dom.totalExposureMinutesOverride,
     dom.exposureDistance,
     dom.targetIntensity,
