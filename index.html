@@ -67,10 +67,10 @@
           <label for="numberOfExposures">Number of exposures</label>
           <input id="numberOfExposures" type="number" min="0" step="1" value="0" />
 
-          <label for="useTotalExposureMinutesOverride">Use manual Beam Minutes override</label>
-          <input id="useTotalExposureMinutesOverride" type="checkbox" />
+          <div id="beamMinutesOverrideControls" style="display: none;" hidden aria-hidden="true">
+            <label for="useTotalExposureMinutesOverride">Use manual Beam Minutes override</label>
+            <input id="useTotalExposureMinutesOverride" type="checkbox" />
 
-          <div id="totalExposureMinutesOverrideWrapper">
             <label for="totalExposureMinutesOverride">Total exposure minutes (manual override)</label>
             <input id="totalExposureMinutesOverride" type="number" min="0" step="0.1" />
           </div>
