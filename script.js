@@ -128,6 +128,7 @@
     jobDate: document.getElementById("jobDate"),
     drawingNumber: document.getElementById("drawingNumber"),
     technician: document.getElementById("technician"),
+    cameraSerial: document.getElementById("cameraSerial"),
     isotope: document.getElementById("isotope"),
     isotopeConstant: document.getElementById("isotopeConstant"),
     focusSpot: document.getElementById("focusSpot"),
@@ -484,6 +485,7 @@
       jobDate: dom.jobDate.value,
       drawingNumber: dom.drawingNumber.value,
       technician: dom.technician.value,
+      cameraSerial: dom.cameraSerial.value,
       isotope: dom.isotope.value,
       focusSpot: dom.focusSpot.value,
       sourceActivity: dom.sourceActivity.value,
@@ -510,6 +512,7 @@
       dom.jobDate.value = state.jobDate || "";
       dom.drawingNumber.value = state.drawingNumber || "";
       dom.technician.value = state.technician || state.cml || "";
+      dom.cameraSerial.value = state.cameraSerial || "";
       dom.isotope.value = state.isotope || "IR192";
       dom.focusSpot.value = state.focusSpot || "";
       dom.sourceActivity.value = state.sourceActivity || "";
@@ -769,6 +772,7 @@
       `Date: ${dom.jobDate.value || "-"}`,
       `Drawing Number: ${dom.drawingNumber.value || "-"}`,
       `Technician: ${dom.technician.value || "-"}`,
+      `Camera Serial Number: ${dom.cameraSerial.value || "-"}`,
     ]);
 
     drawSection("Section 2 — Source Information", [
@@ -846,6 +850,7 @@
     dom.jobDate,
     dom.drawingNumber,
     dom.technician,
+    dom.cameraSerial,
     dom.isotope,
     dom.focusSpot,
     dom.sourceActivity,
