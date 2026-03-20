@@ -720,6 +720,21 @@
         .replace(/&#39;/g, "'");
     }
 
+    function extractFigureNoteForPdf(figure) {
+      const lines = decodeCriteriaForPdf(getFigureCriteria(figure))
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      for (let index = 0; index < lines.length; index += 1) {
+        if (["Note", "Reminder"].includes(lines[index])) {
+          return lines[index + 1] || "";
+        }
+      }
+
+      return "";
+    }
+
     function ensureSpace(requiredHeight) {
       if (y + requiredHeight > pageBottom) {
         pdf.addPage();
@@ -804,19 +819,26 @@
         const result = getShotResult(shot);
         const shotStatus = result.ug > 0.024 ? "FAIL" : "PASS";
 
-        drawSection(`Section 5 — Shot ${index + 1}`, [
+        const figureNumber = String(shot.figure || "").trim() || "-";
+        const figureNote = extractFigureNoteForPdf(shot.figure);
+        const rows = [
           `Shot number: ${index + 1}`,
           `Shot ID / Location: ${shot.shotId || "-"}`,
           `Exposure Time: ${shot.exposureTime || "-"}`,
-          `Figure: ${String(shot.figure || "").trim() || "-"}`,
-          `Figure criteria: ${decodeCriteriaForPdf(getFigureCriteria(shot.figure))}`,
+          `Fig: ${figureNumber}`,
           `PDD: ${Number(shot.pdd || 0).toFixed(3)} in`,
           `SPD: ${Number(shot.spd || 0).toFixed(3)} in`,
           `UG: ${result.ug.toFixed(4)}`,
           `Required Multiplier: ${result.requiredMultiplier > 0 ? `${result.requiredMultiplier}×` : "-"}`,
           `Recommended SPD: ${result.recommendedSpd.toFixed(3)} in`,
           `PASS / FAIL: ${shotStatus}`,
-        ]);
+        ];
+
+        if (figureNote) {
+          rows.push(figureNote);
+        }
+
+        drawSection(`Section 5 — Shot ${index + 1}`, rows);
       });
     }
 
