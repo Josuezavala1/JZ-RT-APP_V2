@@ -8,7 +8,22 @@
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   </head>
   <body>
-    <main class="container">
+    <section class="login-shell" id="loginShell">
+      <form class="login-card" id="loginForm">
+        <h1>RT Shot Planner Login</h1>
+        <p>Enter your credentials to access the app.</p>
+        <label for="loginUsername">Username</label>
+        <input id="loginUsername" name="username" type="text" autocomplete="username" required />
+
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" name="password" type="password" autocomplete="current-password" required />
+
+        <p id="loginError" class="login-error" role="alert" aria-live="polite"></p>
+        <button type="submit" class="btn-primary btn-large">Login</button>
+      </form>
+    </section>
+
+    <main class="container" id="appShell" hidden>
       <header class="page-title-card">
         <h1>Digital RT Shot Planner<br />Safety &amp; Boundary Calculator</h1>
         <p style="display:none;">All radiation values are in mR/hr, distances in feet, and exposure time in minutes.</p>
@@ -131,7 +146,7 @@
       </section>
     </main>
 
-    <footer class="app-footer">Powered by UWC</footer>
+    <footer class="app-footer" id="appFooter" hidden>Powered by UWC</footer>
 
     <script src="script.js?v=1.0.1"></script>
   </body>
