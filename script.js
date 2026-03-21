@@ -763,13 +763,90 @@
       }
     }
 
+    function normalizePdfRow(row) {
+      if (typeof row === "string") {
+        return {
+          text: row,
+        };
+      }
+
+      return row;
+    }
+
+    function getStyledTextWidth(text, fontStyle) {
+      pdf.setFont("helvetica", fontStyle);
+      return pdf.getTextWidth(text);
+    }
+
+    function wrapStyledSegments(segments, maxWidth) {
+      const lines = [];
+      let currentLine = [];
+      let currentWidth = 0;
+
+      function pushCurrentLine() {
+        if (currentLine.length) {
+          lines.push(currentLine);
+          currentLine = [];
+          currentWidth = 0;
+        }
+      }
+
+      function pushToken(text, fontStyle) {
+        const tokenWidth = getStyledTextWidth(text, fontStyle);
+        if (currentWidth + tokenWidth <= maxWidth || currentWidth === 0) {
+          currentLine.push({ text, fontStyle });
+          currentWidth += tokenWidth;
+          return;
+        }
+
+        pushCurrentLine();
+        currentLine.push({ text, fontStyle });
+        currentWidth = tokenWidth;
+      }
+
+      segments.forEach((segment) => {
+        const words = String(segment.text || "").split(/(\s+)/).filter(Boolean);
+        words.forEach((word) => {
+          pushToken(word, segment.fontStyle);
+        });
+      });
+
+      pushCurrentLine();
+
+      return lines.length ? lines : [[{ text: "", fontStyle: "normal" }]];
+    }
+
+    function buildWrappedRow(row, maxWidth) {
+      const normalizedRow = normalizePdfRow(row);
+      if (normalizedRow.text !== undefined) {
+        return wrapStyledSegments([{ text: normalizedRow.text, fontStyle: "normal" }], maxWidth);
+      }
+
+      return wrapStyledSegments(
+        [
+          { text: normalizedRow.label || "", fontStyle: "bold" },
+          { text: normalizedRow.value || "", fontStyle: "normal" },
+        ],
+        maxWidth
+      );
+    }
+
+    function drawWrappedLine(line, x, lineY) {
+      let cursorX = x;
+      line.forEach((segment) => {
+        pdf.setFont("helvetica", segment.fontStyle);
+        pdf.text(segment.text, cursorX, lineY);
+        cursorX += pdf.getTextWidth(segment.text);
+      });
+    }
+
     function drawSection(title, rows) {
       const rowGap = 14;
       const paddingTop = 14;
       const paddingBottom = 12;
       const headerHeight = 20;
       const maxTextWidth = contentWidth - 20;
-      const wrappedRows = rows.map((row) => pdf.splitTextToSize(row, maxTextWidth));
+      const wrappedRows = rows.map((row) => buildWrappedRow(row, maxTextWidth));
       const textHeight = wrappedRows.reduce((height, wrappedRow) => height + wrappedRow.length * rowGap, 0);
       const sectionHeight = paddingTop + headerHeight + textHeight + paddingBottom;
 
@@ -793,7 +870,9 @@
       let rowY = y + paddingTop + headerHeight + 12;
 
       wrappedRows.forEach((wrappedRow) => {
-        pdf.text(wrappedRow, marginX + 10, rowY);
+        wrappedRow.forEach((line, lineIndex) => {
+          drawWrappedLine(line, marginX + 10, rowY + lineIndex * rowGap);
+        });
         rowY += wrappedRow.length * rowGap;
       });
 
@@ -803,33 +882,35 @@
     drawPdfHeader();
 
     drawSection("Section 1 — Job Information", [
-      `Unit / Site: ${dom.unitSite.value || "-"}`,
-      `Date: ${dom.jobDate.value || "-"}`,
-      `Drawing Number: ${dom.drawingNumber.value || "-"}`,
-      `Technician: ${dom.technician.value || "-"}`,
-      `Camera Serial Number: ${dom.cameraSerial.value || "-"}`,
+      { label: "Unit / Site: ", value: dom.unitSite.value || "-" },
+      { label: "Date: ", value: dom.jobDate.value || "-" },
+      { label: "Drawing Number: ", value: dom.drawingNumber.value || "-" },
+      { label: "Technician: ", value: dom.technician.value || "-" },
+      { label: "Camera Serial Number: ", value: dom.cameraSerial.value || "-" },
     ]);
 
     drawSection("Section 2 — Source Information", [
-      `Isotope: ${dom.isotope.value}`,
-      `Constant (mR/hr per Ci @ 1 ft): ${ISOTOPE_CONSTANTS[dom.isotope.value]}`,
-      `Focus Spot (d): ${dom.focusSpot.value || "0"}`,
-      `Source Activity (Ci): ${dom.sourceActivity.value || "0"}`,
+      { label: "Isotope: ", value: dom.isotope.value },
+      { label: "Constant (mR/hr per Ci @ 1 ft): ", value: ISOTOPE_CONSTANTS[dom.isotope.value] },
+      { label: "Focus Spot (d): ", value: dom.focusSpot.value || "0" },
+      { label: "Source Activity (Ci): ", value: dom.sourceActivity.value || "0" },
     ]);
 
     drawSection("Section 3 — Boundary Distances", [
-      `Time Fraction: ${getTimeFraction().toFixed(4)}`,
-      `2 mR/hr Boundary: ${getBoundaryDistance(2).toFixed(1)} ft`,
-      `100 mR/hr Boundary: ${getBoundaryDistance(100).toFixed(1)} ft`,
+      { label: "Time Fraction: ", value: getTimeFraction().toFixed(4) },
+      { label: "2 mR/hr Boundary: ", value: `${getBoundaryDistance(2).toFixed(1)} ft` },
+      { label: "100 mR/hr Boundary: ", value: `${getBoundaryDistance(100).toFixed(1)} ft` },
     ]);
 
     const materialRows = materialLayers.length
       ? materialLayers.map(
-          (layer, index) =>
-            `Layer ${index + 1}: ${layer.material}, Thickness ${layer.thickness} in, HVL ${layer.hvlCount}`
+          (layer, index) => ({
+            label: `Layer ${index + 1}: `,
+            value: `${layer.material}, Thickness ${layer.thickness} in, HVL ${layer.hvlCount}`,
+          })
         )
       : ["No material layers entered."];
-    materialRows.push(`Total attenuation factor: ${getAttenuationFactor().toFixed(6)}`);
+    materialRows.push({ label: "Total attenuation factor: ", value: getAttenuationFactor().toFixed(6) });
     drawSection("Section 4 — Material Layers", materialRows);
 
     if (shotCards.length === 0) {
@@ -842,20 +923,20 @@
         const figureNumber = String(shot.figure || "").trim() || "-";
         const figureNote = extractFigureNoteForPdf(shot.figure);
         const rows = [
-          `Shot number: ${index + 1}`,
-          `Shot ID / Location: ${shot.shotId || "-"}`,
-          `Exposure Time: ${shot.exposureTime || "-"}`,
-          `Fig: ${figureNumber}`,
-          `PDD: ${Number(shot.pdd || 0).toFixed(3)} in`,
-          `SPD: ${Number(shot.spd || 0).toFixed(3)} in`,
-          `UG: ${result.ug.toFixed(4)}`,
-          `Required Multiplier: ${result.requiredMultiplier > 0 ? `${result.requiredMultiplier}×` : "-"}`,
-          `Recommended SPD: ${result.recommendedSpd.toFixed(3)} in`,
-          `PASS / FAIL: ${shotStatus}`,
+          { label: "Shot number: ", value: String(index + 1) },
+          { label: "Shot ID / Location: ", value: shot.shotId || "-" },
+          { label: "Exposure Time: ", value: shot.exposureTime || "-" },
+          { label: "Fig: ", value: figureNumber },
+          { label: "PDD: ", value: `${Number(shot.pdd || 0).toFixed(3)} in` },
+          { label: "SPD: ", value: `${Number(shot.spd || 0).toFixed(3)} in` },
+          { label: "UG: ", value: result.ug.toFixed(4) },
+          { label: "Required Multiplier: ", value: result.requiredMultiplier > 0 ? `${result.requiredMultiplier}×` : "-" },
+          { label: "Recommended SPD: ", value: `${result.recommendedSpd.toFixed(3)} in` },
+          { label: "PASS / FAIL: ", value: shotStatus },
         ];
 
         if (String(shot.notes || "").trim()) {
-          rows.push(`COMPARATOR SERIAL NUMBER / NOTES: ${shot.notes.trim()}`);
+          rows.push({ label: "COMPARATOR SERIAL NUMBER / NOTES: ", value: shot.notes.trim() });
         }
 
         if (figureNote) {
