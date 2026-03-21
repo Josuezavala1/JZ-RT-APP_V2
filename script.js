@@ -444,7 +444,7 @@
             data-shot-field="notes"
             data-shot-id="${shot.id}"
             value="${escapeHtml(shot.notes || "")}"
-            placeholder="PV-3456, OBS from piping, use top wall"
+            placeholder=""
           />
           <label>Figure</label>
           <div>
