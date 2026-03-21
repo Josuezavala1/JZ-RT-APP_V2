@@ -2,6 +2,9 @@
   const USERNAME = "admin";
   const PASSWORD = "Youare#1";
   const AUTH_STORAGE_KEY = "rt-shot-safety-v2-authenticated";
+  const AUTH_USER_STORAGE_KEY = "rt-shot-safety-v2-auth-user";
+  const AUTH_VERSION_STORAGE_KEY = "rt-shot-safety-v2-auth-version";
+  const AUTH_VERSION = "admin-youare-1";
 
   // Locked isotope constants in mR/hr per Ci @ 1 ft.
   const ISOTOPE_CONSTANTS = {
@@ -185,25 +188,52 @@
     dom.appFooter.hidden = true;
   }
 
+  function clearStoredAuth() {
+    [sessionStorage, localStorage].forEach((storage) => {
+      storage.removeItem(AUTH_STORAGE_KEY);
+      storage.removeItem(AUTH_USER_STORAGE_KEY);
+      storage.removeItem(AUTH_VERSION_STORAGE_KEY);
+    });
+  }
+
   function isAuthenticated() {
-    return sessionStorage.getItem(AUTH_STORAGE_KEY) === "true";
+    const isCurrentSessionAuthenticated =
+      sessionStorage.getItem(AUTH_STORAGE_KEY) === "true" &&
+      sessionStorage.getItem(AUTH_USER_STORAGE_KEY) === USERNAME &&
+      sessionStorage.getItem(AUTH_VERSION_STORAGE_KEY) === AUTH_VERSION;
+
+    if (!isCurrentSessionAuthenticated) {
+      clearStoredAuth();
+      return false;
+    }
+
+    return true;
   }
 
   function handleLoginSubmit(event) {
     event.preventDefault();
 
-    const username = dom.loginUsername.value.trim();
+    const username = dom.loginUsername.value;
     const password = dom.loginPassword.value;
-    const isValidLogin = username === USERNAME && password === PASSWORD;
+    const usernameMatched = username === USERNAME;
+    const passwordMatched = password === PASSWORD;
+    const isValidLogin = usernameMatched && passwordMatched;
+
+    console.log("[login-debug] entered username:", username);
+    console.log("[login-debug] username matched:", usernameMatched);
+    console.log("[login-debug] password matched:", passwordMatched);
 
     if (!isValidLogin) {
       dom.loginError.textContent = "Invalid login";
-      sessionStorage.removeItem(AUTH_STORAGE_KEY);
+      clearStoredAuth();
       showLogin();
       return;
     }
 
+    clearStoredAuth();
     sessionStorage.setItem(AUTH_STORAGE_KEY, "true");
+    sessionStorage.setItem(AUTH_USER_STORAGE_KEY, USERNAME);
+    sessionStorage.setItem(AUTH_VERSION_STORAGE_KEY, AUTH_VERSION);
     dom.loginError.textContent = "";
     dom.loginForm.reset();
     showApp();
