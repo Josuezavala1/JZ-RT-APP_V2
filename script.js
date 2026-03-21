@@ -1,4 +1,8 @@
 (function () {
+  const USERNAME = "admin";
+  const PASSWORD = "Youare#1";
+  const AUTH_STORAGE_KEY = "rt-shot-safety-v2-authenticated";
+
   // Locked isotope constants in mR/hr per Ci @ 1 ft.
   const ISOTOPE_CONSTANTS = {
     IR192: 5200,
@@ -124,6 +128,13 @@
   };
 
   const dom = {
+    loginShell: document.getElementById("loginShell"),
+    loginForm: document.getElementById("loginForm"),
+    loginUsername: document.getElementById("loginUsername"),
+    loginPassword: document.getElementById("loginPassword"),
+    loginError: document.getElementById("loginError"),
+    appShell: document.getElementById("appShell"),
+    appFooter: document.getElementById("appFooter"),
     unitSite: document.getElementById("unitSite"),
     jobDate: document.getElementById("jobDate"),
     drawingNumber: document.getElementById("drawingNumber"),
@@ -161,6 +172,42 @@
 
   let materialLayers = [];
   let shotCards = [];
+
+  function showApp() {
+    dom.loginShell.hidden = true;
+    dom.appShell.hidden = false;
+    dom.appFooter.hidden = false;
+  }
+
+  function showLogin() {
+    dom.loginShell.hidden = false;
+    dom.appShell.hidden = true;
+    dom.appFooter.hidden = true;
+  }
+
+  function isAuthenticated() {
+    return sessionStorage.getItem(AUTH_STORAGE_KEY) === "true";
+  }
+
+  function handleLoginSubmit(event) {
+    event.preventDefault();
+
+    const username = dom.loginUsername.value.trim();
+    const password = dom.loginPassword.value;
+    const isValidLogin = username === USERNAME && password === PASSWORD;
+
+    if (!isValidLogin) {
+      dom.loginError.textContent = "Invalid login";
+      sessionStorage.removeItem(AUTH_STORAGE_KEY);
+      showLogin();
+      return;
+    }
+
+    sessionStorage.setItem(AUTH_STORAGE_KEY, "true");
+    dom.loginError.textContent = "";
+    dom.loginForm.reset();
+    showApp();
+  }
 
   // Backward-compatible aliases for legacy names used throughout this file.
   dom.layersContainer = dom.materials;
@@ -1013,5 +1060,15 @@
     dom.generatePdfButton.addEventListener("click", generatePdf);
   }
 
+  if (dom.loginForm) {
+    dom.loginForm.addEventListener("submit", handleLoginSubmit);
+  }
+
   updateAll();
+
+  if (isAuthenticated()) {
+    showApp();
+  } else {
+    showLogin();
+  }
 })();
