@@ -102,6 +102,10 @@ select:focus {
   border-color: var(--primary);
 }
 
+.shot-notes-input {
+  min-height: 2.35rem;
+}
+
 .required {
   color: var(--danger);
 }

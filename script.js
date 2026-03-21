@@ -173,6 +173,15 @@
     return Number.isFinite(value) ? value : 0;
   }
 
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function requiredMissing() {
     return !dom.unitSite.value || !dom.jobDate.value || !dom.drawingNumber.value || numberValue(dom.focusSpot) <= 0 || numberValue(dom.sourceActivity) <= 0;
   }
@@ -419,15 +428,24 @@
         <div class="field-grid">
           <label>Shot ID / Location <span class="required">*</span></label>
           <div>
-            <input type="text" data-shot-field="shotId" data-shot-id="${shot.id}" value="${shot.shotId || ""}" />
+            <input type="text" data-shot-field="shotId" data-shot-id="${shot.id}" value="${escapeHtml(shot.shotId || "")}" />
             ${isShotIdMissing(shot) ? '<div class="field-required-inline">Required</div>' : ""}
           </div>
           <label>Exposure Time</label>
-          <input type="text" data-shot-field="exposureTime" data-shot-id="${shot.id}" value="${shot.exposureTime || ""}" />
+          <input type="text" data-shot-field="exposureTime" data-shot-id="${shot.id}" value="${escapeHtml(shot.exposureTime || "")}" />
           <label>PDD (Pipe-Detector Distance) (in)</label>
           <input type="text" inputmode="decimal" min="0" step="0.001" data-shot-field="pdd" data-shot-id="${shot.id}" value="${shot.pdd}" />
           <label>SPD (Source-Pipe Distance) (in)</label>
           <input type="text" inputmode="decimal" min="0" step="0.001" data-shot-field="spd" data-shot-id="${shot.id}" value="${shot.spd}" />
+          <label>NOTES</label>
+          <input
+            type="text"
+            class="shot-notes-input"
+            data-shot-field="notes"
+            data-shot-id="${shot.id}"
+            value="${escapeHtml(shot.notes || "")}"
+            placeholder="PV-3456, OBS from piping, use top wall"
+          />
           <label>Figure</label>
           <div>
             <select data-shot-field="figure" data-shot-id="${shot.id}">
@@ -529,6 +547,7 @@
             ...shot,
             shotId: shot.shotId || "",
             exposureTime: shot.exposureTime || "",
+            notes: shot.notes || "",
             spd: shot.spd ?? 0,
             figure: shot.figure || "",
           }))
@@ -585,6 +604,7 @@
       id: crypto.randomUUID(),
       shotId: "",
       exposureTime: "",
+      notes: "",
       pdd: 0,
       spd: 0,
       figure: "",
@@ -596,7 +616,7 @@
   function rerenderShotCardsPreserveFocus(activeInput) {
     const isSection5Field =
       activeInput &&
-      activeInput.matches('[data-shot-field="shotId"], [data-shot-field="exposureTime"], [data-shot-field="pdd"], [data-shot-field="spd"], [data-shot-field="figure"]');
+      activeInput.matches('[data-shot-field="shotId"], [data-shot-field="exposureTime"], [data-shot-field="pdd"], [data-shot-field="spd"], [data-shot-field="notes"], [data-shot-field="figure"]');
 
     const cursorStart = isSection5Field ? activeInput.selectionStart : null;
     const cursorEnd = isSection5Field ? activeInput.selectionEnd : null;
@@ -833,6 +853,10 @@
           `Recommended SPD: ${result.recommendedSpd.toFixed(3)} in`,
           `PASS / FAIL: ${shotStatus}`,
         ];
+
+        if (String(shot.notes || "").trim()) {
+          rows.push(`NOTES: ${shot.notes.trim()}`);
+        }
 
         if (figureNote) {
           rows.push(figureNote);
