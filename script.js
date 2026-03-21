@@ -437,7 +437,7 @@
           <input type="text" inputmode="decimal" min="0" step="0.001" data-shot-field="pdd" data-shot-id="${shot.id}" value="${shot.pdd}" />
           <label>SPD (Source-Pipe Distance) (in)</label>
           <input type="text" inputmode="decimal" min="0" step="0.001" data-shot-field="spd" data-shot-id="${shot.id}" value="${shot.spd}" />
-          <label>NOTES</label>
+          <label>COMPARATOR SERIAL NUMBER / NOTES</label>
           <input
             type="text"
             class="shot-notes-input"
@@ -855,7 +855,7 @@
         ];
 
         if (String(shot.notes || "").trim()) {
-          rows.push(`NOTES: ${shot.notes.trim()}`);
+          rows.push(`COMPARATOR SERIAL NUMBER / NOTES: ${shot.notes.trim()}`);
         }
 
         if (figureNote) {
