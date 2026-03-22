@@ -310,6 +310,11 @@
       return getTotalExposureMinutes();
     }
 
+    function getMaxDoseRateDuringExposure() {
+      const timeFraction = getTimeFraction();
+      return timeFraction > 0 ? (2 / timeFraction).toFixed(1) : "—";
+    }
+
     function getComputedExposureMinutesFromInputs() {
       const timePerExposureRaw = dom.timePerExposure.value;
       const numberOfExposuresRaw = dom.numberOfExposures.value;
@@ -688,7 +693,7 @@
       const timeFraction = getTimeFraction();
       dom.beamMinutesPerHour.textContent = getBeamMinutesPerHour().toFixed(1);
       dom.timeFraction.textContent = timeFraction.toFixed(4);
-      dom.maxDoseAtPublic.textContent = timeFraction > 0 ? (2 / timeFraction).toFixed(1) : "—";
+      dom.maxDoseAtPublic.textContent = getMaxDoseRateDuringExposure();
 
       dom.attenuationFactor.textContent = getAttenuationFactor().toFixed(6);
       dom.boundary2.textContent = `${getBoundaryDistance(2).toFixed(1)} ft`;
@@ -1013,6 +1018,8 @@
       ]);
 
       drawSection("Section 3 — Boundary Distances", [
+        { label: "Beam Minutes per Hour: ", value: getBeamMinutesPerHour().toFixed(1) },
+        { label: "Max Dose Rate During Exposure (mR/hr): ", value: getMaxDoseRateDuringExposure() },
         { label: "Time Fraction: ", value: getTimeFraction().toFixed(4) },
         { label: "2 mR/hr Boundary: ", value: `${getBoundaryDistance(2).toFixed(1)} ft` },
         { label: "100 mR/hr Boundary: ", value: `${getBoundaryDistance(100).toFixed(1)} ft` },
