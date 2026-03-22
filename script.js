@@ -493,7 +493,7 @@
 
         wrapper.innerHTML = `
           <div class="card-row-title">
-            <span class="material-layer-title">Layer ${index + 1}</span>
+            <span class="material-layer-title${index === 0 ? " section-header-blue-text" : ""}">Layer ${index + 1}</span>
             <button type="button" class="btn-remove" data-remove-layer="${layer.id}">Remove</button>
           </div>
           <div class="field-grid">
@@ -549,7 +549,7 @@
               value="${escapeHtml(shot.notes || "")}"
               placeholder=""
             />
-            <label>Figure</label>
+            <label class="section-header-blue-text">Figure</label>
             <div>
               <select data-shot-field="figure" data-shot-id="${shot.id}">
                 <option value="" ${(shot.figure || "") === "" ? "selected" : ""}>Select</option>
