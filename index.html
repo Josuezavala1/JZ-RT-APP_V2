@@ -10,8 +10,11 @@
   <body>
     <section class="login-shell" id="loginShell">
       <form class="login-card" id="loginForm">
-        <h1>RT Shot Planner Login</h1>
-        <p>Enter your credentials to access the app.</p>
+        <div class="login-brand-header">
+          <h1 class="login-title">RT Shot Planner Login</h1>
+          <div class="login-title-accent" aria-hidden="true"></div>
+          <p>Enter your credentials to access the app.</p>
+        </div>
         <label for="loginUsername">Username</label>
         <input id="loginUsername" name="username" type="text" autocomplete="username" required />
 
@@ -20,6 +23,7 @@
 
         <p id="loginError" class="login-error" role="alert" aria-live="polite"></p>
         <button type="submit" class="btn-primary btn-large">Login</button>
+        <p class="login-powered-by">Powered by UWC</p>
       </form>
     </section>
 
