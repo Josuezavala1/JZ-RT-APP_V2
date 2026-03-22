@@ -442,6 +442,20 @@
       return FIGURE_CRITERIA[String(figure || "").trim()] || "-";
     }
 
+    function getFigureCriteriaMarkup(figure) {
+      const criteria = getFigureCriteria(figure);
+      const [title, ...lines] = String(criteria || "").split("\n");
+
+      if (!title) {
+        return escapeHtml(criteria);
+      }
+
+      return [
+        `<span class="field-figure-heading">${escapeHtml(title)}</span>`,
+        ...lines.map((line) => escapeHtml(line)),
+      ].join("<br>");
+    }
+
     function getFigureImage(figure) {
       return FIGURE_IMAGE_MAP[String(figure || "").trim()] || "";
     }
@@ -559,7 +573,7 @@
                 <option value="4" ${shot.figure === "4" ? "selected" : ""}>4</option>
                 <option value="5" ${shot.figure === "5" ? "selected" : ""}>5</option>
               </select>
-              ${shot.figure ? `<div class="field-figure-image-inline">${getFigureCriteria(shot.figure)}</div>` : ""}
+              ${shot.figure ? `<div class="field-figure-image-inline">${getFigureCriteriaMarkup(shot.figure)}</div>` : ""}
             </div>
           </div>
           <div class="result-grid">

@@ -126,6 +126,7 @@ label {
 
 .section-header-blue-text {
   color: rgb(0, 102, 204);
+  font-weight: 700;
 }
 
 input,
@@ -275,6 +276,11 @@ select:focus {
   padding: 0.7rem;
   font-size: 0.84rem;
   color: var(--muted);
+}
+
+.field-figure-heading {
+  color: rgb(0, 102, 204);
+  font-weight: 700;
 }
 
 .app-footer {
