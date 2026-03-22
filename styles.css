@@ -124,6 +124,10 @@ label {
   font-weight: 700;
 }
 
+.section-header-blue-text {
+  color: rgb(0, 102, 204);
+}
+
 input,
 select {
   width: 100%;
