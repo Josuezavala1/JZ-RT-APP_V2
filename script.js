@@ -493,20 +493,20 @@
 
         wrapper.innerHTML = `
           <div class="card-row-title">
-            <span>Layer ${index + 1}</span>
+            <span class="material-layer-title">Layer ${index + 1}</span>
             <button type="button" class="btn-remove" data-remove-layer="${layer.id}">Remove</button>
           </div>
           <div class="field-grid">
-            <label>Material</label>
+            <label class="ui-bold-label">Material</label>
             <select data-layer-field="material" data-layer-id="${layer.id}">
               <option value="Steel" ${layer.material === "Steel" ? "selected" : ""}>Steel</option>
               <option value="Concrete" ${layer.material === "Concrete" ? "selected" : ""}>Concrete</option>
               <option value="Lead" ${layer.material === "Lead" ? "selected" : ""}>Lead</option>
               <option value="Tungsten" ${layer.material === "Tungsten" ? "selected" : ""}>Tungsten</option>
             </select>
-            <label>Thickness (inches)</label>
+            <label class="ui-bold-label">Thickness (inches)</label>
             <input type="number" min="0" step="0.001" data-layer-field="thickness" data-layer-id="${layer.id}" value="${layer.thickness}" />
-            <label>HVL count</label>
+            <label class="ui-bold-label">HVL count</label>
             <input type="number" min="0" step="0.001" data-layer-field="hvlCount" data-layer-id="${layer.id}" value="${layer.hvlCount}" />
           </div>
         `;
@@ -525,22 +525,22 @@
 
         wrapper.innerHTML = `
           <div class="card-row-title">
-            <span>Shot ${index + 1}</span>
+            <span class="shot-title">Shot ${index + 1}</span>
             <button type="button" class="btn-remove" data-remove-shot="${shot.id}">Remove</button>
           </div>
           <div class="field-grid">
-            <label>Shot ID / Location <span class="required">*</span></label>
+            <label class="ui-bold-label">Shot ID / Location <span class="required">*</span></label>
             <div>
               <input type="text" data-shot-field="shotId" data-shot-id="${shot.id}" value="${escapeHtml(shot.shotId || "")}" />
               ${isShotIdMissing(shot) ? '<div class="field-required-inline">Required</div>' : ""}
             </div>
-            <label>Exposure Time</label>
+            <label class="ui-bold-label">Exposure Time</label>
             <input type="text" data-shot-field="exposureTime" data-shot-id="${shot.id}" value="${escapeHtml(shot.exposureTime || "")}" />
-            <label>PDD (Pipe-Detector Distance) (in)</label>
+            <label class="ui-bold-label">PDD (Pipe-Detector Distance) (in)</label>
             <input type="text" inputmode="decimal" min="0" step="0.001" data-shot-field="pdd" data-shot-id="${shot.id}" value="${shot.pdd}" />
-            <label>SPD (Source-Pipe Distance) (in)</label>
+            <label class="ui-bold-label">SPD (Source-Pipe Distance) (in)</label>
             <input type="text" inputmode="decimal" min="0" step="0.001" data-shot-field="spd" data-shot-id="${shot.id}" value="${shot.spd}" />
-            <label>COMPARATOR SERIAL NUMBER / NOTES</label>
+            <label class="ui-bold-label">Comparator Serial Number / Notes</label>
             <input
               type="text"
               class="shot-notes-input"

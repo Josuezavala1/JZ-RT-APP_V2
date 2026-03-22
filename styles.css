@@ -110,6 +110,20 @@ label {
   font-size: 0.92rem;
 }
 
+.ui-bold-label {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.shot-title {
+  color: rgb(0, 102, 204);
+  font-weight: 700;
+}
+
+.material-layer-title {
+  font-weight: 700;
+}
+
 input,
 select {
   width: 100%;
