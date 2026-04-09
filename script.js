@@ -13,6 +13,30 @@
     "Se-75": 2200,
   };
 
+  // Existing HVL reference table (inches) used for Section 4 attenuation calculations.
+  const MATERIAL_ISOTOPE_HVL_TABLE = {
+    Steel: {
+      IR192: 0.49,
+      "Co-60": 0.83,
+      "Se-75": 0.21,
+    },
+    Concrete: {
+      IR192: 1.7,
+      "Co-60": 2.4,
+      "Se-75": 0.95,
+    },
+    Lead: {
+      IR192: 0.1,
+      "Co-60": 0.49,
+      "Se-75": 0.055,
+    },
+    Tungsten: {
+      IR192: 0.095,
+      "Co-60": 0.39,
+      "Se-75": 0.05,
+    },
+  };
+
   const STORAGE_KEY = "rt-shot-safety-v2-state";
   const FIGURE_CRITERIA = {
     "1": [
@@ -295,10 +319,40 @@
       }
 
       return materialLayers.reduce((factor, layer) => {
-        const hvlCount = Number(layer.hvlCount) || 0;
-        const layerFactor = Math.pow(0.5, hvlCount);
+        const layerFactor = Number(layer.attenuationFactor);
+        if (!Number.isFinite(layerFactor) || layerFactor <= 0) {
+          return factor;
+        }
         return factor * layerFactor;
       }, 1);
+    }
+
+    function getHvlReference(material, isotope) {
+      return MATERIAL_ISOTOPE_HVL_TABLE?.[material]?.[isotope];
+    }
+
+    function calculateLayerShieldingValues(layer) {
+      const isotope = dom.isotope.value;
+      const thickness = Number(layer.thickness);
+      const safeThickness = Number.isFinite(thickness) && thickness >= 0 ? thickness : 0;
+      const hvlReference = getHvlReference(layer.material, isotope);
+
+      if (!Number.isFinite(hvlReference) || hvlReference <= 0) {
+        layer.hvlCount = 0;
+        layer.attenuationFactor = 1;
+        layer.hvlWarning = "No reference HVL value available for this material and isotope.";
+        return;
+      }
+
+      const hvlCount = safeThickness / hvlReference;
+      const attenuationFactor = Math.pow(0.5, hvlCount);
+      layer.hvlCount = hvlCount;
+      layer.attenuationFactor = attenuationFactor;
+      layer.hvlWarning = "";
+    }
+
+    function syncLayersFromThickness() {
+      materialLayers.forEach((layer) => calculateLayerShieldingValues(layer));
     }
 
     function getTimeFraction() {
@@ -526,7 +580,14 @@
             <label class="ui-bold-label">Thickness (inches)</label>
             <input type="number" min="0" step="0.001" data-layer-field="thickness" data-layer-id="${layer.id}" value="${layer.thickness}" />
             <label class="ui-bold-label">HVL count</label>
-            <input type="number" min="0" step="0.001" data-layer-field="hvlCount" data-layer-id="${layer.id}" value="${layer.hvlCount}" />
+            <input type="number" min="0" step="0.001" data-layer-field="hvlCount" data-layer-id="${layer.id}" value="${Number(layer.hvlCount || 0).toFixed(3)}" readonly />
+            <label class="ui-bold-label">Layer attenuation</label>
+            <input type="text" value="${Number(layer.attenuationFactor || 1).toFixed(6)}" readonly />
+            ${
+              layer.hvlWarning
+                ? `<div class="result-item warning-yellow" style="grid-column: 1 / -1;"><strong>${escapeHtml(layer.hvlWarning)}</strong></div>`
+                : ""
+            }
           </div>
         `;
 
@@ -612,6 +673,12 @@
         }
       });
 
+      materialLayers.forEach((layer, index) => {
+        if (layer.hvlWarning) {
+          warnings.push({ text: `Layer ${index + 1}: ${layer.hvlWarning}`, css: "warning-yellow" });
+        }
+      });
+
       if (!warnings.length) {
         warnings.push({ text: "No active warnings.", css: "" });
       }
@@ -682,6 +749,8 @@
     }
 
     function updateAll() {
+      syncLayersFromThickness();
+
       const hasMissingShotId = shotCards.some((shot) => isShotIdMissing(shot));
 
       dom.isotopeConstant.value = ISOTOPE_CONSTANTS[dom.isotope.value];
@@ -716,6 +785,8 @@
         material: "Steel",
         thickness: 0,
         hvlCount: 0,
+        attenuationFactor: 1,
+        hvlWarning: "",
       });
       renderLayers();
       updateAll();
@@ -782,6 +853,9 @@
       if (layerId && layerField) {
         const layer = materialLayers.find((item) => item.id === layerId);
         if (layer) {
+          if (layerField === "hvlCount") {
+            return;
+          }
           layer[layerField] = event.target.value;
           updateAll();
           return;
@@ -1029,7 +1103,9 @@
         ? materialLayers.map(
             (layer, index) => ({
               label: `Layer ${index + 1}: `,
-              value: `${layer.material}, Thickness ${layer.thickness} in, HVL ${layer.hvlCount}`,
+              value: `${layer.material}, Thickness ${layer.thickness} in, HVL ${Number(layer.hvlCount || 0).toFixed(3)}, Layer attenuation ${Number(
+                layer.attenuationFactor || 1
+              ).toFixed(6)}`,
             })
           )
         : ["No material layers entered."];
