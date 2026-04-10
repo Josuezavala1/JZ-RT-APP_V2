@@ -1056,17 +1056,18 @@
         pdf.setTextColor(0, 0, 0);
       }
 
-      function drawSection(title, rows) {
-        const rowGap = 14;
-        const paddingTop = 14;
-        const paddingBottom = 12;
-        const headerHeight = 20;
+      function drawSection(title, rows, options = {}) {
+        const rowGap = options.rowGap ?? 14;
+        const paddingTop = options.paddingTop ?? 14;
+        const paddingBottom = options.paddingBottom ?? 12;
+        const headerHeight = options.headerHeight ?? 20;
+        const sectionGap = options.sectionGap ?? 12;
         const maxTextWidth = contentWidth - 20;
         const wrappedRows = rows.map((row) => buildWrappedRow(row, maxTextWidth));
         const textHeight = wrappedRows.reduce((height, wrappedRow) => height + wrappedRow.length * rowGap, 0);
         const sectionHeight = paddingTop + headerHeight + textHeight + paddingBottom;
 
-        ensureSpace(sectionHeight + 12);
+        ensureSpace(sectionHeight + sectionGap);
 
         pdf.setDrawColor(90, 90, 90);
         pdf.setLineWidth(1);
@@ -1092,7 +1093,7 @@
           rowY += wrappedRow.length * rowGap;
         });
 
-        y += sectionHeight + 12;
+        y += sectionHeight + sectionGap;
       }
 
       drawPdfHeader();
@@ -1163,7 +1164,13 @@
             rows.push(figureNote);
           }
 
-          drawSection(`Section 5 — Shot ${index + 1}`, rows);
+          drawSection(`Section 5 — Shot ${index + 1}`, rows, {
+            headerHeight: 16,
+            paddingTop: 10,
+            paddingBottom: 8,
+            rowGap: 12,
+            sectionGap: 8,
+          });
         });
       }
 
