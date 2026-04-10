@@ -335,20 +335,19 @@
       const isotope = dom.isotope.value;
       const thickness = Number(layer.thickness);
       const safeThickness = Number.isFinite(thickness) && thickness >= 0 ? thickness : 0;
+      const manualHvlCount = Number(layer.hvlCount);
+      const safeManualHvlCount = Number.isFinite(manualHvlCount) && manualHvlCount >= 0 ? manualHvlCount : 0;
       const hvlReference = getHvlReference(layer.material, isotope);
+      const hasValidReference = Number.isFinite(hvlReference) && hvlReference > 0;
+      const convertedHvl = hasValidReference ? safeThickness / hvlReference : 0;
+      const totalHvl = safeManualHvlCount + convertedHvl;
+      const attenuationFactor = Math.pow(0.5, totalHvl);
 
-      if (!Number.isFinite(hvlReference) || hvlReference <= 0) {
-        layer.hvlCount = 0;
-        layer.attenuationFactor = 1;
-        layer.hvlWarning = "No reference HVL value available for this material and isotope.";
-        return;
-      }
-
-      const hvlCount = safeThickness / hvlReference;
-      const attenuationFactor = Math.pow(0.5, hvlCount);
-      layer.hvlCount = hvlCount;
       layer.attenuationFactor = attenuationFactor;
-      layer.hvlWarning = "";
+      layer.hvlWarning =
+        !hasValidReference && safeThickness > 0
+          ? "No reference HVL value available for this material and isotope."
+          : "";
     }
 
     function syncLayersFromThickness() {
@@ -580,7 +579,7 @@
             <label class="ui-bold-label">Thickness (inches)</label>
             <input type="number" min="0" step="0.001" data-layer-field="thickness" data-layer-id="${layer.id}" value="${layer.thickness}" />
             <label class="ui-bold-label">HVL count</label>
-            <input type="number" min="0" step="0.001" data-layer-field="hvlCount" data-layer-id="${layer.id}" value="${Number(layer.hvlCount || 0).toFixed(3)}" readonly />
+            <input type="number" min="0" step="0.001" data-layer-field="hvlCount" data-layer-id="${layer.id}" value="${escapeHtml(layer.hvlCount ?? 0)}" />
             <label class="ui-bold-label">Layer attenuation</label>
             <input type="text" value="${Number(layer.attenuationFactor || 1).toFixed(6)}" readonly />
             ${
@@ -853,9 +852,6 @@
       if (layerId && layerField) {
         const layer = materialLayers.find((item) => item.id === layerId);
         if (layer) {
-          if (layerField === "hvlCount") {
-            return;
-          }
           layer[layerField] = event.target.value;
           updateAll();
           return;
