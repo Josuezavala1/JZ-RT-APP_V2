@@ -1001,23 +1001,23 @@
           }
         }
 
-        function pushToken(text, fontStyle) {
+        function pushToken(text, fontStyle, color) {
           const tokenWidth = getStyledTextWidth(text, fontStyle);
           if (currentWidth + tokenWidth <= maxWidth || currentWidth === 0) {
-            currentLine.push({ text, fontStyle });
+            currentLine.push({ text, fontStyle, color });
             currentWidth += tokenWidth;
             return;
           }
 
           pushCurrentLine();
-          currentLine.push({ text, fontStyle });
+          currentLine.push({ text, fontStyle, color });
           currentWidth = tokenWidth;
         }
 
         segments.forEach((segment) => {
           const words = String(segment.text || "").split(/(\s+)/).filter(Boolean);
           words.forEach((word) => {
-            pushToken(word, segment.fontStyle);
+            pushToken(word, segment.fontStyle, segment.color);
           });
         });
 
@@ -1035,7 +1035,7 @@
         return wrapStyledSegments(
           [
             { text: normalizedRow.label || "", fontStyle: "bold" },
-            { text: normalizedRow.value || "", fontStyle: "normal" },
+            { text: normalizedRow.value || "", fontStyle: "normal", color: normalizedRow.valueColor },
           ],
           maxWidth
         );
@@ -1045,9 +1045,15 @@
         let cursorX = x;
         line.forEach((segment) => {
           pdf.setFont("helvetica", segment.fontStyle);
+          if (Array.isArray(segment.color)) {
+            pdf.setTextColor(segment.color[0], segment.color[1], segment.color[2]);
+          } else {
+            pdf.setTextColor(0, 0, 0);
+          }
           pdf.text(segment.text, cursorX, lineY);
           cursorX += pdf.getTextWidth(segment.text);
         });
+        pdf.setTextColor(0, 0, 0);
       }
 
       function drawSection(title, rows) {
@@ -1146,7 +1152,7 @@
             { label: "UG: ", value: result.ug.toFixed(4) },
             { label: "Required Multiplier: ", value: result.requiredMultiplier > 0 ? `${result.requiredMultiplier}×` : "-" },
             { label: "Recommended SPD: ", value: `${result.recommendedSpd.toFixed(3)} in` },
-            { label: "PASS / FAIL: ", value: shotStatus },
+            { label: "PASS / FAIL: ", value: shotStatus, valueColor: shotStatus === "PASS" ? [0, 150, 0] : [200, 0, 0] },
           ];
 
           if (String(shot.notes || "").trim()) {
