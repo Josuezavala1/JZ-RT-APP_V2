@@ -581,7 +581,13 @@
             <label class="ui-bold-label">HVL count</label>
             <input type="number" min="0" step="0.001" data-layer-field="hvlCount" data-layer-id="${layer.id}" value="${escapeHtml(layer.hvlCount ?? 0)}" />
             <label class="ui-bold-label">Layer attenuation</label>
-            <input type="text" value="${Number(layer.attenuationFactor || 1).toFixed(6)}" readonly />
+            <input
+              type="text"
+              data-layer-output="attenuationFactor"
+              data-layer-id="${layer.id}"
+              value="${Number(layer.attenuationFactor || 1).toFixed(6)}"
+              readonly
+            />
             ${
               layer.hvlWarning
                 ? `<div class="result-item warning-yellow" style="grid-column: 1 / -1;"><strong>${escapeHtml(layer.hvlWarning)}</strong></div>`
@@ -591,6 +597,18 @@
         `;
 
         dom.layersContainer.appendChild(wrapper);
+      });
+    }
+
+    function syncLayerAttenuationDisplays() {
+      const attenuationFields = dom.layersContainer.querySelectorAll('[data-layer-output="attenuationFactor"][data-layer-id]');
+      attenuationFields.forEach((field) => {
+        const layerId = field.getAttribute("data-layer-id");
+        const layer = materialLayers.find((item) => item.id === layerId);
+        if (!layer) {
+          return;
+        }
+        field.value = Number(layer.attenuationFactor || 1).toFixed(6);
       });
     }
 
@@ -749,6 +767,7 @@
 
     function updateAll() {
       syncLayersFromThickness();
+      syncLayerAttenuationDisplays();
 
       const hasMissingShotId = shotCards.some((shot) => isShotIdMissing(shot));
 
