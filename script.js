@@ -68,7 +68,7 @@
       "Viewing: Double Wall",
       "",
       "Pipe Condition",
-      "Pipe greater than 4 inches up to 6 inches.",
+      "Pipe equal to or greater than 4 inches up to 6 inches.",
       "",
       "Setup",
       "Aim at the center of the pipe.",
