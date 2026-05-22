@@ -1192,16 +1192,15 @@
         const notesValue = String(shot.notes || "").trim() || "-";
 
         const cardPaddingX = 10;
-        const cardPaddingTop = 8;
-        const cardPaddingBottom = 8;
-        const headerHeight = 14;
+        const cardPaddingTop = 14;
+        const cardPaddingBottom = 10;
         const lineGap = 12;
         const rowCount = 5;
         const rowBlockHeight = rowCount * lineGap;
-        const fullRowSpacing = 4;
+        const fullRowSpacing = 6;
         const sectionGap = 8;
         const contentLeft = marginX + cardPaddingX;
-        const contentTop = y + cardPaddingTop + headerHeight + 10;
+        const contentTop = y + cardPaddingTop;
         const columnGap = 20;
         const columnWidth = (contentWidth - cardPaddingX * 2 - columnGap) / 2;
         const leftColX = contentLeft;
@@ -1236,25 +1235,17 @@
         ];
 
         const notesRows = buildWrappedRow({ label: "Comparator / Notes: ", value: notesValue }, contentWidth - cardPaddingX * 2);
-        const reminderRows = figureNote ? buildWrappedRow(figureNote, contentWidth - cardPaddingX * 2) : [];
+        const reminderRows = figureNote ? buildWrappedRow({ label: "Reminder: ", value: figureNote }, contentWidth - cardPaddingX * 2) : [];
         const notesHeight = notesRows.length * lineGap;
         const reminderHeight = reminderRows.length * lineGap;
         const reminderSpacing = reminderRows.length ? fullRowSpacing : 0;
-        const cardHeight = cardPaddingTop + headerHeight + 10 + rowBlockHeight + fullRowSpacing + notesHeight + reminderSpacing + reminderHeight + cardPaddingBottom;
+        const cardHeight = cardPaddingTop + rowBlockHeight + fullRowSpacing + notesHeight + reminderSpacing + reminderHeight + cardPaddingBottom;
 
         ensureSpace(cardHeight + sectionGap);
 
         pdf.setDrawColor(90, 90, 90);
         pdf.setLineWidth(1);
         pdf.roundedRect(marginX, y, contentWidth, cardHeight, 4, 4);
-
-        pdf.setFillColor(0, 102, 204);
-        pdf.rect(marginX + 1, y + 1, contentWidth - 2, headerHeight, "F");
-
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(10);
-        pdf.setTextColor(255, 255, 255);
-        pdf.text(`Section 5 — Shot ${index + 1}`, marginX + 10, y + 11);
 
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(9.5);
