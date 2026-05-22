@@ -56,7 +56,7 @@
       "Maximum magnification: 20 percent.",
       "",
       "Inspection Zone:",
-      "Within 6 inches of the comparator ball.",
+      "Within 6 inches of the comparator ball. (6.4.1 / Pg.6)",
       "",
       "Procedure Ref:",
       "6.3.1 / 6.3.4 / Fig.1 / Pg.4–5",
@@ -79,7 +79,7 @@
       "Both walls may be measured.",
       "",
       "Inspection Zone:",
-      "Within 6 inches of the comparator ball.",
+      "Within 6 inches of the comparator ball. (6.4.1 / Pg.6)",
       "",
       "Procedure Ref:",
       "6.3.3 / 6.4.2 / Fig.2 / Pg.4–5",
@@ -104,7 +104,7 @@
       "Both walls may be measured as long as they remain within the inspection zone.",
       "",
       "Inspection Zone:",
-      "Within 6 inches of the comparator ball.",
+      "Within 6 inches of the comparator ball. (6.4.1 / Pg.6)",
       "",
       "Procedure Ref:",
       "6.3.2 / Fig.3 / Pg.4–5",
@@ -129,7 +129,7 @@
       "Only the inspection zone on one wall is evaluated.",
       "",
       "Inspection Zone:",
-      "Within 6 inches of the comparator ball.",
+      "Within 6 inches of the comparator ball. (6.4.1 / Pg.6)",
       "",
       "Procedure Ref:",
       "6.3.5 / Fig.4 / Pg.4–6",
@@ -151,7 +151,7 @@
       "Both walls may be evaluated.",
       "",
       "Inspection Zone:",
-      "Within 6 inches of the comparator ball.",
+      "Within 6 inches of the comparator ball. (6.4.1 / Pg.6)",
       "",
       "Procedure Ref:",
       "6.3.3 / Fig.5 / Pg.4–6",
@@ -710,7 +710,7 @@
             <div class="result-item"><strong>Required Multiplier:</strong> ${result.requiredMultiplier > 0 ? `${result.requiredMultiplier}×` : "-"}</div>
             <div class="result-item"><strong>Recommended SPD (in):</strong> ${result.recommendedSpd.toFixed(3)}</div>
             <div class="result-item"><strong>UG @ Recommended:</strong> ${result.ugAtRecommended.toFixed(4)}</div>
-            ${result.ug > 0.024 ? '<div class="result-item warning-red"><strong>UG Status:</strong> FAIL — UG exceeds 0.024. Increase SPD.</div>' : '<div class="result-item warning-green"><strong>UG Status:</strong> PASS — UG is within 0.024.</div>'}
+            ${result.ug > 0.024 ? '<div class="result-item warning-red"><strong>UG Status:</strong> FAIL — UG exceeds 0.024 (6.6.1 / Pg.7). Increase SPD.</div>' : '<div class="result-item warning-green"><strong>UG Status:</strong> PASS — UG is within 0.024 (6.6.1 / Pg.7).</div>'}
           </div>
         `;
 
@@ -731,7 +731,7 @@
 
         const result = getShotResult(shot);
         if (result.ug > 0.024) {
-          warnings.push({ text: `Shot ${index + 1}: UG exceeds 0.024.`, css: "warning-red" });
+          warnings.push({ text: `Shot ${index + 1}: UG exceeds 0.024 (6.6.1 / Pg.7).`, css: "warning-red" });
         }
       });
 
