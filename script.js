@@ -1268,7 +1268,20 @@
         drawPdfFooter(pageNumber, totalPages);
       }
 
-      pdf.save("RT_Shot_Safety_Report_v2.pdf");
+      const sanitizeFilenamePart = (value, fallback) => {
+        const sanitized = String(value || "")
+          .trim()
+          .replace(/\s+/g, "-")
+          .replace(/[^A-Za-z0-9_-]/g, "");
+        return sanitized || fallback;
+      };
+
+      const drawingPart = sanitizeFilenamePart(dom.drawingNumber.value, "NO-DRAWING");
+      const technicianPart = sanitizeFilenamePart(dom.technician.value, "NO-TECH");
+      const datePart = sanitizeFilenamePart(dom.jobDate.value, "NO-DATE");
+      const downloadFilename = `${drawingPart}_${technicianPart}_${datePart}.pdf`;
+
+      pdf.save(downloadFilename);
     }
 
     loadState();
