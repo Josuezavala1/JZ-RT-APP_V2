@@ -1201,13 +1201,7 @@
         y += headerHeight + sectionGap;
       }
 
-      function drawShotCard(shot, index) {
-        const result = getShotResult(shot);
-        const shotStatus = result.ug > 0.024 ? "FAIL" : "PASS";
-        const figureNumber = String(shot.figure || "").trim() || "-";
-        const figureNote = extractFigureNoteForPdf(shot.figure);
-        const notesValue = String(shot.notes || "").trim() || "-";
-
+      function getShotCardMetrics(shot) {
         const cardPaddingX = 10;
         const cardPaddingTop = 14;
         const cardPaddingBottom = 10;
@@ -1216,6 +1210,37 @@
         const rowBlockHeight = rowCount * lineGap;
         const fullRowSpacing = 6;
         const sectionGap = 8;
+        const notesValue = String(shot.notes || "").trim() || "-";
+        const figureNote = extractFigureNoteForPdf(shot.figure);
+        const notesRows = buildWrappedRow({ label: "Comparator / Notes: ", value: notesValue }, contentWidth - cardPaddingX * 2);
+        const reminderRows = figureNote ? buildWrappedRow({ label: "Reminder: ", value: figureNote }, contentWidth - cardPaddingX * 2) : [];
+        const notesHeight = notesRows.length * lineGap;
+        const reminderHeight = reminderRows.length * lineGap;
+        const reminderSpacing = reminderRows.length ? fullRowSpacing : 0;
+        const cardHeight = cardPaddingTop + rowBlockHeight + fullRowSpacing + notesHeight + reminderSpacing + reminderHeight + cardPaddingBottom;
+
+        return {
+          cardPaddingX,
+          cardPaddingTop,
+          lineGap,
+          rowBlockHeight,
+          fullRowSpacing,
+          sectionGap,
+          notesRows,
+          reminderRows,
+          notesHeight,
+          reminderSpacing,
+          cardHeight,
+        };
+      }
+
+      function drawShotCard(shot, index) {
+        const result = getShotResult(shot);
+        const shotStatus = result.ug > 0.024 ? "FAIL" : "PASS";
+        const figureNumber = String(shot.figure || "").trim() || "-";
+        const metrics = getShotCardMetrics(shot);
+        const { cardPaddingX, cardPaddingTop, lineGap, rowBlockHeight, fullRowSpacing, sectionGap, notesRows, reminderRows, notesHeight, reminderSpacing, cardHeight } =
+          metrics;
         const contentLeft = marginX + cardPaddingX;
         const contentTop = y + cardPaddingTop;
         const columnGap = 20;
@@ -1250,13 +1275,6 @@
             right: { label: "Rec SPD:", value: `${result.recommendedSpd.toFixed(3)} in` },
           },
         ];
-
-        const notesRows = buildWrappedRow({ label: "Comparator / Notes: ", value: notesValue }, contentWidth - cardPaddingX * 2);
-        const reminderRows = figureNote ? buildWrappedRow({ label: "Reminder: ", value: figureNote }, contentWidth - cardPaddingX * 2) : [];
-        const notesHeight = notesRows.length * lineGap;
-        const reminderHeight = reminderRows.length * lineGap;
-        const reminderSpacing = reminderRows.length ? fullRowSpacing : 0;
-        const cardHeight = cardPaddingTop + rowBlockHeight + fullRowSpacing + notesHeight + reminderSpacing + reminderHeight + cardPaddingBottom;
 
         ensureSpace(cardHeight + sectionGap);
 
@@ -1347,8 +1365,26 @@
         drawSection("Section 5 — Shot Cards", ["No shots entered."]);
       } else {
         drawSection5Header();
+        let shotsOnCurrentPage = 0;
+        let isFirstShotsPage = true;
+
         shotCards.forEach((shot, index) => {
+          const { cardHeight, sectionGap } = getShotCardMetrics(shot);
+          const maxShotsForPage = isFirstShotsPage ? 1 : 4;
+          const exceedsCountLimit = shotsOnCurrentPage >= maxShotsForPage;
+          const exceedsPageArea = y + cardHeight + sectionGap > maxY;
+
+          if (exceedsCountLimit || exceedsPageArea) {
+            pdf.addPage();
+            y = topY;
+            drawPdfHeader();
+            drawSection5Header();
+            shotsOnCurrentPage = 0;
+            isFirstShotsPage = false;
+          }
+
           drawShotCard(shot, index);
+          shotsOnCurrentPage += 1;
         });
       }
 
