@@ -53,7 +53,7 @@
       "Only one wall is viewed.",
       "",
       "Limits:",
-      "Maximum magnification: 20 percent.",
+      "Maximum magnification: 20 percent. (6.7 / Pg.7–8)",
       "",
       "Inspection Zone:",
       "Within 6 inches of the comparator ball. (6.4.1 / Pg.6)",
