@@ -324,8 +324,16 @@
         .replace(/'/g, "&#39;");
     }
 
+    function getMissingRequiredJobFields() {
+      const missingFields = [];
+      if (!dom.jobDate.value) missingFields.push("Date");
+      if (!dom.drawingNumber.value) missingFields.push("Drawing Number");
+      if (!dom.technician.value) missingFields.push("Technician");
+      return missingFields;
+    }
+
     function requiredMissing() {
-      return !dom.unitSite.value || !dom.jobDate.value || !dom.drawingNumber.value || numberValue(dom.focusSpot) <= 0 || numberValue(dom.sourceActivity) <= 0;
+      return !dom.unitSite.value || getMissingRequiredJobFields().length > 0 || numberValue(dom.focusSpot) <= 0 || numberValue(dom.sourceActivity) <= 0;
     }
 
     function getAttenuationFactor() {
@@ -748,6 +756,17 @@
         warnings.push({ text: "Missing required inputs in Job Information or Source Information.", css: "warning-yellow" });
       }
 
+      const missingRequiredJobFields = getMissingRequiredJobFields();
+      if (missingRequiredJobFields.includes("Date")) {
+        warnings.push({ text: "Date required", css: "warning-yellow" });
+      }
+      if (missingRequiredJobFields.includes("Drawing Number")) {
+        warnings.push({ text: "Drawing Number required", css: "warning-yellow" });
+      }
+      if (missingRequiredJobFields.includes("Technician")) {
+        warnings.push({ text: "Technician required", css: "warning-yellow" });
+      }
+
       shotCards.forEach((shot, index) => {
         if (isShotIdMissing(shot)) {
           warnings.push({ text: `Shot ${index + 1}: Shot ID / Location is required.`, css: "warning-yellow" });
@@ -976,7 +995,7 @@
     }
 
     function generatePdf() {
-      if (shotCards.some((shot) => isShotIdMissing(shot))) {
+      if (requiredMissing() || shotCards.some((shot) => isShotIdMissing(shot))) {
         return;
       }
 
