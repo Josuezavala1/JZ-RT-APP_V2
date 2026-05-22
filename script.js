@@ -1184,7 +1184,24 @@
         y += sectionHeight + sectionGap;
       }
 
-      function drawShotCard(shot, index) {
+      function drawSection5Header() {
+        const headerHeight = 20;
+        const sectionGap = 8;
+        ensureSpace(headerHeight + sectionGap);
+        pdf.setFillColor(0, 102, 204);
+        pdf.rect(marginX + 1, y + 1, contentWidth - 2, headerHeight, "F");
+        pdf.setDrawColor(90, 90, 90);
+        pdf.setLineWidth(1);
+        pdf.roundedRect(marginX, y, contentWidth, headerHeight + 2, 4, 4);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(11);
+        pdf.setTextColor(255, 255, 255);
+        pdf.text("Section 5 — Shots", marginX + 10, y + 15);
+        pdf.setTextColor(0, 0, 0);
+        y += headerHeight + sectionGap;
+      }
+
+      function getShotCardLayout(shot, index, cardWidth) {
         const result = getShotResult(shot);
         const shotStatus = result.ug > 0.024 ? "FAIL" : "PASS";
         const figureNumber = String(shot.figure || "").trim() || "-";
@@ -1198,13 +1215,9 @@
         const rowCount = 5;
         const rowBlockHeight = rowCount * lineGap;
         const fullRowSpacing = 6;
-        const sectionGap = 8;
-        const contentLeft = marginX + cardPaddingX;
-        const contentTop = y + cardPaddingTop;
+        const contentTop = cardPaddingTop;
         const columnGap = 20;
-        const columnWidth = (contentWidth - cardPaddingX * 2 - columnGap) / 2;
-        const leftColX = contentLeft;
-        const rightColX = contentLeft + columnWidth + columnGap;
+        const columnWidth = (cardWidth - cardPaddingX * 2 - columnGap) / 2;
         const defaultTextColor = [0, 0, 0];
 
         const fixedRows = [
@@ -1234,59 +1247,110 @@
           },
         ];
 
-        const notesRows = buildWrappedRow({ label: "Comparator / Notes: ", value: notesValue }, contentWidth - cardPaddingX * 2);
-        const reminderRows = figureNote ? buildWrappedRow({ label: "Reminder: ", value: figureNote }, contentWidth - cardPaddingX * 2) : [];
+        const notesRows = buildWrappedRow({ label: "Comparator / Notes: ", value: notesValue }, cardWidth - cardPaddingX * 2);
+        const reminderRows = figureNote ? buildWrappedRow({ label: "Reminder: ", value: figureNote }, cardWidth - cardPaddingX * 2) : [];
         const notesHeight = notesRows.length * lineGap;
         const reminderHeight = reminderRows.length * lineGap;
         const reminderSpacing = reminderRows.length ? fullRowSpacing : 0;
         const cardHeight = cardPaddingTop + rowBlockHeight + fullRowSpacing + notesHeight + reminderSpacing + reminderHeight + cardPaddingBottom;
 
-        ensureSpace(cardHeight + sectionGap);
+        return {
+          cardPaddingX,
+          lineGap,
+          rowBlockHeight,
+          fullRowSpacing,
+          contentTop,
+          columnGap,
+          columnWidth,
+          defaultTextColor,
+          fixedRows,
+          notesRows,
+          reminderRows,
+          notesHeight,
+          reminderSpacing,
+          cardHeight,
+        };
+      }
+
+      function drawShotCardAtPosition(shot, index, cardX, cardY, cardWidth) {
+        const layout = getShotCardLayout(shot, index, cardWidth);
+        const contentLeft = cardX + layout.cardPaddingX;
+        const leftColX = contentLeft;
+        const rightColX = contentLeft + layout.columnWidth + layout.columnGap;
+        const contentTop = cardY + layout.contentTop;
 
         pdf.setDrawColor(90, 90, 90);
         pdf.setLineWidth(1);
-        pdf.roundedRect(marginX, y, contentWidth, cardHeight, 4, 4);
+        pdf.roundedRect(cardX, cardY, cardWidth, layout.cardHeight, 4, 4);
 
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(9.5);
-        pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
+        pdf.setTextColor(layout.defaultTextColor[0], layout.defaultTextColor[1], layout.defaultTextColor[2]);
 
         const drawColumnCell = (cell, startX, lineY) => {
           const label = `${cell.label} `;
           pdf.setFont("helvetica", "bold");
-          pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
+          pdf.setTextColor(layout.defaultTextColor[0], layout.defaultTextColor[1], layout.defaultTextColor[2]);
           pdf.text(label, startX, lineY);
           const labelWidth = pdf.getTextWidth(label);
           pdf.setFont("helvetica", "normal");
           if (Array.isArray(cell.valueColor)) {
             pdf.setTextColor(cell.valueColor[0], cell.valueColor[1], cell.valueColor[2]);
           } else {
-            pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
+            pdf.setTextColor(layout.defaultTextColor[0], layout.defaultTextColor[1], layout.defaultTextColor[2]);
           }
-          pdf.text(String(cell.value), startX + labelWidth, lineY, { maxWidth: columnWidth - labelWidth });
-          pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
+          pdf.text(String(cell.value), startX + labelWidth, lineY, { maxWidth: layout.columnWidth - labelWidth });
+          pdf.setTextColor(layout.defaultTextColor[0], layout.defaultTextColor[1], layout.defaultTextColor[2]);
         };
 
-        fixedRows.forEach((row, rowIndex) => {
-          const lineY = contentTop + rowIndex * lineGap;
+        layout.fixedRows.forEach((row, rowIndex) => {
+          const lineY = contentTop + rowIndex * layout.lineGap;
           drawColumnCell(row.left, leftColX, lineY);
           drawColumnCell(row.right, rightColX, lineY);
         });
 
-        let extraY = contentTop + rowBlockHeight + fullRowSpacing;
-        notesRows.forEach((line, lineIndex) => {
-          drawWrappedLine(line, contentLeft, extraY + lineIndex * lineGap);
+        let extraY = contentTop + layout.rowBlockHeight + layout.fullRowSpacing;
+        layout.notesRows.forEach((line, lineIndex) => {
+          drawWrappedLine(line, contentLeft, extraY + lineIndex * layout.lineGap);
         });
-        extraY += notesHeight;
+        extraY += layout.notesHeight;
 
-        if (reminderRows.length) {
-          extraY += reminderSpacing;
-          reminderRows.forEach((line, lineIndex) => {
-            drawWrappedLine(line, contentLeft, extraY + lineIndex * lineGap);
+        if (layout.reminderRows.length) {
+          extraY += layout.reminderSpacing;
+          layout.reminderRows.forEach((line, lineIndex) => {
+            drawWrappedLine(line, contentLeft, extraY + lineIndex * layout.lineGap);
           });
         }
+      }
 
-        y += cardHeight + sectionGap;
+      function drawShotCardsGrid() {
+        drawSection5Header();
+        const cardGap = 10;
+        const rowGap = 8;
+        const cardWidth = (contentWidth - cardGap) / 2;
+        const footerPadding = 20;
+        const availableBottom = pdf.internal.pageSize.getHeight() - footerPadding;
+
+        for (let i = 0; i < shotCards.length; i += 2) {
+          const leftShot = shotCards[i];
+          const rightShot = shotCards[i + 1];
+          const leftLayout = getShotCardLayout(leftShot, i, cardWidth);
+          const rightLayout = rightShot ? getShotCardLayout(rightShot, i + 1, cardWidth) : null;
+          const rowHeight = Math.max(leftLayout.cardHeight, rightLayout ? rightLayout.cardHeight : 0);
+
+          if (y + rowHeight > availableBottom) {
+            pdf.addPage();
+            y = startY;
+            drawPdfHeader();
+            drawSection5Header();
+          }
+
+          drawShotCardAtPosition(leftShot, i, marginX, y, cardWidth);
+          if (rightShot) {
+            drawShotCardAtPosition(rightShot, i + 1, marginX + cardWidth + cardGap, y, cardWidth);
+          }
+          y += rowHeight + rowGap;
+        }
       }
 
       drawPdfHeader();
@@ -1330,9 +1394,7 @@
       if (shotCards.length === 0) {
         drawSection("Section 5 — Shot Cards", ["No shots entered."]);
       } else {
-        shotCards.forEach((shot, index) => {
-          drawShotCard(shot, index);
-        });
+        drawShotCardsGrid();
       }
 
       const totalPages = pdf.getNumberOfPages();
