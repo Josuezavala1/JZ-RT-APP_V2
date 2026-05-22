@@ -45,18 +45,21 @@
       "Exposure: Single Wall",
       "Viewing: Single Wall",
       "",
-      "Pipe Condition",
-      "Pipe greater than 6 inches or when best accuracy is required.",
+      "Pipe Condition:",
+      "Pipe greater than 6 inches or when maximum accuracy is required.",
       "",
-      "Setup",
+      "Setup:",
       "Aim between the pipe wall and the comparator ball.",
       "Only one wall is viewed.",
       "",
-      "Limits",
+      "Limits:",
       "Maximum magnification: 20 percent.",
       "",
-      "Inspection Zone",
+      "Inspection Zone:",
       "Within 6 inches of the comparator ball.",
+      "",
+      "Procedure Ref:",
+      "6.3.1 / 6.3.4 / Fig.1 / Pg.4–5",
       "",
       "Note",
       "If pipe is 6 inches or below, double wall exposure may be used.",
@@ -67,16 +70,19 @@
       "Exposure: Double Wall",
       "Viewing: Double Wall",
       "",
-      "Pipe Condition",
+      "Pipe Condition:",
       "Pipe equal to or greater than 4 inches up to 6 inches.",
       "",
-      "Setup",
+      "Setup:",
       "Aim at the center of the pipe.",
       "Place two comparator balls, one on each side of the pipe wall.",
       "Both walls may be measured.",
       "",
-      "Inspection Zone",
+      "Inspection Zone:",
       "Within 6 inches of the comparator ball.",
+      "",
+      "Procedure Ref:",
+      "6.3.3 / 6.4.2 / Fig.2 / Pg.4–5",
       "",
       "Reminder",
       "If insulation is greater than 1.5 inches, use Figure 4.",
@@ -87,18 +93,21 @@
       "Exposure: Double Wall",
       "Viewing: Double Wall",
       "",
-      "Pipe Condition",
+      "Pipe Condition:",
       "Pipe 3 inches or smaller.",
       "",
-      "Setup",
+      "Setup:",
       "Aim at the center of the pipe.",
       "Use one comparator ball on one wall.",
       "",
-      "Inspection Rule",
+      "Inspection Rule:",
       "Both walls may be measured as long as they remain within the inspection zone.",
       "",
-      "Inspection Zone",
+      "Inspection Zone:",
       "Within 6 inches of the comparator ball.",
+      "",
+      "Procedure Ref:",
+      "6.3.2 / Fig.3 / Pg.4–5",
       "",
       "Reminder",
       "If insulation is greater than 1.5 inches, use Figure 4.",
@@ -109,18 +118,21 @@
       "Exposure: Single Wall",
       "Viewing: Single Wall",
       "",
-      "Pipe Condition",
+      "Pipe Condition:",
       "Pipe greater than 6 inches.",
       "",
-      "Insulation Condition",
+      "Insulation Condition:",
       "Used when insulation is greater than 1.5 inches.",
       "",
-      "Setup",
+      "Setup:",
       "Aim between the comparator ball and the insulation.",
       "Only the inspection zone on one wall is evaluated.",
       "",
-      "Inspection Zone",
+      "Inspection Zone:",
       "Within 6 inches of the comparator ball.",
+      "",
+      "Procedure Ref:",
+      "6.3.5 / Fig.4 / Pg.4–6",
     ].join("\n"),
     "5": [
       "FIGURE 5",
@@ -128,18 +140,21 @@
       "Exposure: Double Wall",
       "Viewing: Double Wall",
       "",
-      "Pipe Condition",
+      "Pipe Condition:",
       "Pipe 6 inches or smaller.",
       "",
-      "Insulation Condition",
+      "Insulation Condition:",
       "Used when insulation is 1.5 inches or less.",
       "",
-      "Setup",
+      "Setup:",
       "Aim at the center of the pipe.",
       "Both walls may be evaluated.",
       "",
-      "Inspection Zone",
+      "Inspection Zone:",
       "Within 6 inches of the comparator ball.",
+      "",
+      "Procedure Ref:",
+      "6.3.3 / Fig.5 / Pg.4–6",
       "",
       "Reminder",
       "If insulation is greater than 1.5 inches, use Figure 4.",
@@ -508,9 +523,39 @@
         return escapeHtml(criteria);
       }
 
+      const boldLabels = new Set([
+        "Exposure",
+        "Viewing",
+        "Pipe Condition",
+        "Insulation Condition",
+        "Setup",
+        "Limits",
+        "Inspection Rule",
+        "Inspection Zone",
+        "Procedure Ref",
+        "Reminder",
+        "Note",
+      ]);
+
       return [
         `<span class="field-figure-heading">${escapeHtml(title)}</span>`,
-        ...lines.map((line) => escapeHtml(line)),
+        ...lines.map((line) => {
+          const trimmedLine = String(line || "");
+          const labelValueMatch = trimmedLine.match(/^([^:]+):(.*)$/);
+          if (labelValueMatch) {
+            const rawLabel = labelValueMatch[1].trim();
+            const rawValue = labelValueMatch[2];
+            if (boldLabels.has(rawLabel)) {
+              return `<strong>${escapeHtml(rawLabel)}:</strong>${escapeHtml(rawValue)}`;
+            }
+          }
+
+          if (boldLabels.has(trimmedLine.replace(/:$/, ""))) {
+            return `<strong>${escapeHtml(trimmedLine.replace(/:$/, ""))}:</strong>`;
+          }
+
+          return escapeHtml(trimmedLine);
+        }),
       ].join("<br>");
     }
 
