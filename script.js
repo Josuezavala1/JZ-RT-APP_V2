@@ -1195,53 +1195,52 @@
         const cardPaddingTop = 8;
         const cardPaddingBottom = 8;
         const headerHeight = 14;
-        const lineGap = 10;
-        const rowGap = 2;
+        const lineGap = 12;
+        const rowCount = 5;
+        const rowBlockHeight = rowCount * lineGap;
+        const fullRowSpacing = 4;
+        const sectionGap = 8;
         const contentLeft = marginX + cardPaddingX;
-        const contentTop = y + cardPaddingTop + headerHeight + 8;
-        const columnGap = 16;
+        const contentTop = y + cardPaddingTop + headerHeight + 10;
+        const columnGap = 20;
         const columnWidth = (contentWidth - cardPaddingX * 2 - columnGap) / 2;
         const leftColX = contentLeft;
         const rightColX = contentLeft + columnWidth + columnGap;
         const defaultTextColor = [0, 0, 0];
 
-        const leftRows = [
-          { label: "Shot #:", value: String(index + 1) },
-          { label: "ID:", value: shot.shotId || "-" },
-          { label: "PDD:", value: `${Number(shot.pdd || 0).toFixed(3)} in` },
-          { label: "UG:", value: result.ug.toFixed(4) },
-          { label: "Req Mult:", value: result.requiredMultiplier > 0 ? `${result.requiredMultiplier}×` : "-" },
-        ];
-        const rightRows = [
-          { label: "Fig:", value: figureNumber },
-          { label: "Exposure:", value: shot.exposureTime || "-" },
-          { label: "SPD:", value: `${Number(shot.spd || 0).toFixed(3)} in` },
-          { label: "PASS / FAIL:", value: shotStatus, valueColor: shotStatus === "PASS" ? [0, 150, 0] : [200, 0, 0] },
-          { label: "Rec SPD:", value: `${result.recommendedSpd.toFixed(3)} in` },
+        const fixedRows = [
+          {
+            left: { label: "Shot #:", value: String(index + 1) },
+            right: { label: "Fig:", value: figureNumber },
+          },
+          {
+            left: { label: "ID:", value: shot.shotId || "-" },
+            right: { label: "Exposure:", value: shot.exposureTime || "-" },
+          },
+          {
+            left: { label: "PDD:", value: `${Number(shot.pdd || 0).toFixed(3)} in` },
+            right: { label: "SPD:", value: `${Number(shot.spd || 0).toFixed(3)} in` },
+          },
+          {
+            left: { label: "UG:", value: result.ug.toFixed(4) },
+            right: {
+              label: "PASS / FAIL:",
+              value: shotStatus,
+              valueColor: shotStatus === "PASS" ? [0, 150, 0] : [200, 0, 0],
+            },
+          },
+          {
+            left: { label: "Req Mult:", value: result.requiredMultiplier > 0 ? `${result.requiredMultiplier}×` : "-" },
+            right: { label: "Rec SPD:", value: `${result.recommendedSpd.toFixed(3)} in` },
+          },
         ];
 
-        const notesRows = buildWrappedRow(
-          { label: "Comparator / Notes: ", value: notesValue },
-          contentWidth - cardPaddingX * 2
-        );
+        const notesRows = buildWrappedRow({ label: "Comparator / Notes: ", value: notesValue }, contentWidth - cardPaddingX * 2);
         const reminderRows = figureNote ? buildWrappedRow(figureNote, contentWidth - cardPaddingX * 2) : [];
-        const maxColumnRows = Math.max(leftRows.length, rightRows.length);
-        const columnsHeight = maxColumnRows * lineGap + (maxColumnRows - 1) * rowGap;
         const notesHeight = notesRows.length * lineGap;
         const reminderHeight = reminderRows.length * lineGap;
-        const notesSpacing = 6;
-        const reminderSpacing = reminderRows.length ? 4 : 0;
-        const sectionGap = 8;
-        const cardHeight =
-          cardPaddingTop +
-          headerHeight +
-          8 +
-          columnsHeight +
-          notesSpacing +
-          notesHeight +
-          reminderSpacing +
-          reminderHeight +
-          cardPaddingBottom;
+        const reminderSpacing = reminderRows.length ? fullRowSpacing : 0;
+        const cardHeight = cardPaddingTop + headerHeight + 10 + rowBlockHeight + fullRowSpacing + notesHeight + reminderSpacing + reminderHeight + cardPaddingBottom;
 
         ensureSpace(cardHeight + sectionGap);
 
@@ -1261,29 +1260,29 @@
         pdf.setFontSize(9.5);
         pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
 
-        const drawColumnRows = (rows, startX) => {
-          rows.forEach((row, rowIndex) => {
-            const lineY = contentTop + rowIndex * (lineGap + rowGap);
-            const label = `${row.label} `;
-            pdf.setFont("helvetica", "bold");
+        const drawColumnCell = (cell, startX, lineY) => {
+          const label = `${cell.label} `;
+          pdf.setFont("helvetica", "bold");
+          pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
+          pdf.text(label, startX, lineY);
+          const labelWidth = pdf.getTextWidth(label);
+          pdf.setFont("helvetica", "normal");
+          if (Array.isArray(cell.valueColor)) {
+            pdf.setTextColor(cell.valueColor[0], cell.valueColor[1], cell.valueColor[2]);
+          } else {
             pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
-            pdf.text(label, startX, lineY);
-            const labelWidth = pdf.getTextWidth(label);
-            pdf.setFont("helvetica", "normal");
-            if (Array.isArray(row.valueColor)) {
-              pdf.setTextColor(row.valueColor[0], row.valueColor[1], row.valueColor[2]);
-            } else {
-              pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
-            }
-            pdf.text(String(row.value), startX + labelWidth, lineY, { maxWidth: columnWidth - labelWidth });
-          });
+          }
+          pdf.text(String(cell.value), startX + labelWidth, lineY, { maxWidth: columnWidth - labelWidth });
           pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
         };
 
-        drawColumnRows(leftRows, leftColX);
-        drawColumnRows(rightRows, rightColX);
+        fixedRows.forEach((row, rowIndex) => {
+          const lineY = contentTop + rowIndex * lineGap;
+          drawColumnCell(row.left, leftColX, lineY);
+          drawColumnCell(row.right, rightColX, lineY);
+        });
 
-        let extraY = contentTop + columnsHeight + notesSpacing;
+        let extraY = contentTop + rowBlockHeight + fullRowSpacing;
         notesRows.forEach((line, lineIndex) => {
           drawWrappedLine(line, contentLeft, extraY + lineIndex * lineGap);
         });
