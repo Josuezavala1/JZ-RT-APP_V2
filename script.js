@@ -567,14 +567,14 @@
           <div class="dr-reference-split">
             <div class="dr-reference-section">
               <div class="dr-reference-section-title">Comparator</div>
-              <p>Comparator Physical:<br/>±0.005 inches<br/>(Pg.3)</p>
-              <p>Comparator Acceptance:<br/>1.03 max / 0.970 min<br/>(±3 percent)<br/>(5.3 / Pg.17)</p>
+              <p><strong>Comparator Physical</strong>:<br/>±0.005 inches<br/>(Pg.3)</p>
+              <p><strong>Comparator Acceptance</strong>:<br/>1.03 max / 0.970 min<br/>(±3 percent)<br/>(5.3 / Pg.17)</p>
             </div>
             <div class="dr-reference-divider" aria-hidden="true"></div>
             <div class="dr-reference-section">
               <div class="dr-reference-section-title">DR Pixel Values</div>
-              <p>14-bit:<br/><strong>15%</strong>=2458<br/><strong>90%</strong>=14746</p>
-              <p>16-bit:<br/><strong>15%</strong>=9830<br/><strong>90%</strong>=58982</p>
+              <p><strong>14-bit</strong>:<br/><strong>15%</strong>=2458<br/><strong>90%</strong>=14746</p>
+              <p><strong>16-bit</strong>:<br/><strong>15%</strong>=9830<br/><strong>90%</strong>=58982</p>
               <p>(Pg.8)</p>
             </div>
           </div>
