@@ -381,6 +381,10 @@ select:focus {
   color: rgb(0, 102, 204);
 }
 
+.dr-reference-section strong.dr-reference-label-black {
+  color: #111827;
+}
+
 @media (max-width: 420px) {
   .dr-reference-split {
     grid-template-columns: 1fr;
