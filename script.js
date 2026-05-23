@@ -1170,7 +1170,7 @@
         pdf.text(title, marginX + 10, y + 15);
 
         pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(10);
+        pdf.setFontSize(options.bodyFontSize ?? 10);
         pdf.setTextColor(0, 0, 0);
         let rowY = y + paddingTop + headerHeight + 12;
 
@@ -1254,10 +1254,11 @@
 
           drawSection(`Section 5 — Shot ${index + 1}`, rows, {
             headerHeight: 16,
-            paddingTop: 10,
-            paddingBottom: 8,
-            rowGap: 12,
-            sectionGap: 8,
+            paddingTop: 8,
+            paddingBottom: 6,
+            rowGap: 10,
+            sectionGap: 6,
+            bodyFontSize: 9,
           });
         });
       }
