@@ -52,37 +52,16 @@ body {
   text-align: center;
 }
 
-.header-logo {
-  display: block;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-}
-
-.login-logo {
-  margin: 0 auto 0.35rem;
-  max-height: 72px;
-  max-width: min(240px, 76vw);
-}
-
 .app-header-inner {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 1fr;
   align-items: center;
   gap: 0.75rem;
 }
 
 .app-header-inner h1 {
-  grid-column: 2;
   text-align: center;
   min-width: 0;
-}
-
-.app-logo {
-  grid-column: 1;
-  width: auto;
-  max-height: 64px;
-  max-width: 64px;
 }
 
 .login-title {
@@ -430,14 +409,3 @@ select:focus {
 }
 
 
-@media (max-width: 700px) {
-  .login-logo {
-    max-height: 72px;
-    max-width: min(170px, 44vw);
-  }
-
-  .app-logo {
-    max-height: 48px;
-    max-width: 48px;
-  }
-}
