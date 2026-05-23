@@ -169,7 +169,7 @@
     "5": "assets/fig5.svg",
   };
   const PDF_HEADER_LOGO_DATA =
-    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9Ijg4IiBmaWxsPSIjMGI0ZWEyIi8+PGcgZmlsbD0iI2Y3YzYwMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2IDI1NikiPjxjaXJjbGUgcj0iNDYiLz48cGF0aCBkPSJNLTE4LTY4aDM2bDYyLTEwOGgtMTYweiIvPjxwYXRoIGQ9Ik0xOCA2OGgtMzZsLTYyIDEwOGgxNjB6Ii8+PHBhdGggZD0iTTY4LTE4djM2bDEwOCA2MnYtMTYweiIvPjxwYXRoIGQ9Ik0tNjggMTh2LTM2bC0xMDgtNjJ2MTYweiIvPjwvZz48dGV4dCB4PSIyNTYiIHk9IjQ0MCIgZm9udC1zaXplPSI2MiIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iNzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5SVDwvdGV4dD48L3N2Zz4=";
+    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA1MTIgNTEyJz48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9J2JnJyB4MT0nMCcgeTE9JzAnIHgyPScxJyB5Mj0nMSc+PHN0b3Agb2Zmc2V0PScwJyBzdG9wLWNvbG9yPScjMWEyNDMwJy8+PHN0b3Agb2Zmc2V0PScxJyBzdG9wLWNvbG9yPScjMGYxODIzJy8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9JzUxMicgaGVpZ2h0PSc1MTInIHJ4PSc4OCcgZmlsbD0ndXJsKCNiZyknLz48ZyB0cmFuc2Zvcm09J3RyYW5zbGF0ZSgyNTYgMjI4KSc+PGNpcmNsZSByPSc0MicgZmlsbD0nI2ZmZicvPjxnIGZpbGw9JyNmZmYnPjxwYXRoIGQ9J00tMTYtNjJoMzJsNTQtOTRoLTE0MHonLz48cGF0aCBkPSdNMTYgNjJoLTMybC01NCA5NGgxNDB6Jy8+PHBhdGggZD0nTTYyLTE2djMybDk0IDU0di0xNDB6Jy8+PHBhdGggZD0nTS02MiAxNnYtMzJsLTk0LTU0djE0MHonLz48L2c+PC9nPjxnIGZpbGw9JyNmZmYnIGZvbnQtZmFtaWx5PSdBcmlhbCwgc2Fucy1zZXJpZicgZm9udC13ZWlnaHQ9JzcwMCcgdGV4dC1hbmNob3I9J21pZGRsZSc+PHRleHQgeD0nMjU2JyB5PSczOTInIGZvbnQtc2l6ZT0nNzInPlJUPC90ZXh0Pjx0ZXh0IHg9JzI1NicgeT0nNDQ2JyBmb250LXNpemU9JzQwJyBsZXR0ZXItc3BhY2luZz0nMS4yJz5TSE9UIFBMQU5ORVI8L3RleHQ+PC9nPjwvc3ZnPg==";
 
   const authDom = {
     loginShell: document.getElementById("loginShell"),
@@ -1011,7 +1011,7 @@
       function drawPdfHeader() {
         const pageWidth = pdf.internal.pageSize.getWidth();
         try {
-          pdf.addImage(PDF_HEADER_LOGO_DATA, "SVG", 44, 14, 28, 28);
+          pdf.addImage(PDF_HEADER_LOGO_DATA, "SVG", 44, 14, 30, 30);
         } catch (error) {
           console.warn("Unable to render PDF header logo", error);
         }

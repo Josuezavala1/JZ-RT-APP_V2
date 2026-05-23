@@ -77,8 +77,10 @@ body {
 
 .app-logo {
   grid-column: 1;
-  width: 46px;
-  height: 46px;
+  width: auto;
+  height: auto;
+  max-height: 90px;
+  max-width: min(220px, 34vw);
 }
 
 .login-title {
@@ -422,5 +424,13 @@ select:focus {
 
   .dr-reference-divider {
     display: none;
+  }
+}
+
+
+@media (max-width: 700px) {
+  .app-logo {
+    max-height: 64px;
+    max-width: min(170px, 44vw);
   }
 }
