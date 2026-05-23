@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Radiation icon">
+  <rect width="512" height="512" rx="96" ry="96" fill="#0b4ea2"/>
+  <g fill="#ffffff" transform="translate(256 256)">
+    <circle r="26"/>
+    <path d="M-24-42A48 48 0 0 1 24-42L74-128A148 148 0 0 0 -74-128Z"/>
+    <path d="M-24-42A48 48 0 0 1 24-42L74-128A148 148 0 0 0 -74-128Z" transform="rotate(120)"/>
+    <path d="M-24-42A48 48 0 0 1 24-42L74-128A148 148 0 0 0 -74-128Z" transform="rotate(240)"/>
+  </g>
+</svg>
