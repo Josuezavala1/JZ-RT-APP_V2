@@ -1,10 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Radiation icon">
-  <rect width="256" height="256" rx="36" fill="#0066cc"/>
-  <g transform="translate(128 128)">
-    <circle r="26" fill="#ffffff"/>
-    <path fill="#ffffff" d="M0-101a101 101 0 0 1 44.2 10.2L24.3-56.3A54 54 0 0 0 0-62Z"/>
-    <path fill="#ffffff" d="M87.5 50.5A101 101 0 0 1 0 101V62a54 54 0 0 0 46.8-27Z"/>
-    <path fill="#ffffff" d="M-87.5 50.5A101 101 0 0 1-44.2-90.8l19.9 34.5A54 54 0 0 0-46.8 27Z"/>
-    <circle r="10" fill="#0066cc"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="SHOT PLANNER logo">
+  <rect width="512" height="512" rx="96" fill="#0b3d91"/>
+  <g transform="translate(256 220)" fill="#ffffff">
+    <circle r="28"/>
+    <path d="M0-116a116 116 0 0 1 53 12l-23.5 40.5A69 69 0 0 0 0-70z"/>
+    <path d="M100.5 58A116 116 0 0 1 0 116V70a69 69 0 0 0 59.8-34.5z"/>
+    <path d="M-100.5 58A116 116 0 0 1-53-104l23.5 40.5A69 69 0 0 0-59.8 34.5z"/>
+    <circle r="11" fill="#0b3d91"/>
   </g>
+  <text x="256" y="438" text-anchor="middle" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="66" font-weight="800" letter-spacing="1.6">SHOT PLANNER</text>
 </svg>

@@ -81,8 +81,8 @@ body {
 .app-logo {
   grid-column: 1;
   width: auto;
-  max-height: 64px;
-  max-width: 64px;
+  max-height: 90px;
+  max-width: 90px;
 }
 
 .login-title {
@@ -437,7 +437,7 @@ select:focus {
   }
 
   .app-logo {
-    max-height: 48px;
-    max-width: 48px;
+    max-height: 64px;
+    max-width: 64px;
   }
 }
