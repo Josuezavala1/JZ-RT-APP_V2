@@ -168,6 +168,8 @@
     "4": "assets/fig4.svg",
     "5": "assets/fig5.svg",
   };
+  const PDF_HEADER_LOGO_DATA =
+    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9Ijg4IiBmaWxsPSIjMGI0ZWEyIi8+PGcgZmlsbD0iI2Y3YzYwMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjU2IDI1NikiPjxjaXJjbGUgcj0iNDYiLz48cGF0aCBkPSJNLTE4LTY4aDM2bDYyLTEwOGgtMTYweiIvPjxwYXRoIGQ9Ik0xOCA2OGgtMzZsLTYyIDEwOGgxNjB6Ii8+PHBhdGggZD0iTTY4LTE4djM2bDEwOCA2MnYtMTYweiIvPjxwYXRoIGQ9Ik0tNjggMTh2LTM2bC0xMDgtNjJ2MTYweiIvPjwvZz48dGV4dCB4PSIyNTYiIHk9IjQ0MCIgZm9udC1zaXplPSI2MiIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iNzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5SVDwvdGV4dD48L3N2Zz4=";
 
   const authDom = {
     loginShell: document.getElementById("loginShell"),
@@ -1008,6 +1010,11 @@
 
       function drawPdfHeader() {
         const pageWidth = pdf.internal.pageSize.getWidth();
+        try {
+          pdf.addImage(PDF_HEADER_LOGO_DATA, "SVG", 44, 14, 28, 28);
+        } catch (error) {
+          console.warn("Unable to render PDF header logo", error);
+        }
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(16);
         pdf.setTextColor(0, 0, 0);
