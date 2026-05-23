@@ -54,13 +54,15 @@ body {
 
 .header-logo {
   display: block;
-  width: 42px;
-  height: 42px;
+  width: auto;
+  height: auto;
   object-fit: contain;
 }
 
 .login-logo {
-  margin: 0 auto 0.2rem;
+  margin: 0 auto 0.35rem;
+  max-height: 90px;
+  max-width: min(240px, 76vw);
 }
 
 .app-header-inner {
@@ -77,8 +79,7 @@ body {
 
 .app-logo {
   grid-column: 1;
-  width: auto;
-  height: auto;
+  margin: 0 auto;
   max-height: 90px;
   max-width: min(220px, 34vw);
 }
@@ -429,6 +430,7 @@ select:focus {
 
 
 @media (max-width: 700px) {
+  .login-logo,
   .app-logo {
     max-height: 64px;
     max-width: min(170px, 44vw);
