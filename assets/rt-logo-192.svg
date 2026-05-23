@@ -1,21 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="RT Shot Planner logo">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0b4ea2"/>
-      <stop offset="1" stop-color="#08356f"/>
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="88" fill="url(#bg)"/>
-  <g transform="translate(256 256)">
-    <circle r="46" fill="#f7c600"/>
-    <g fill="#f7c600">
-      <path d="M-18-68h36l62-108h-160z"/>
-      <path d="M18 68h-36l-62 108h160z"/>
-      <path d="M68-18v36l108 62v-160z"/>
-      <path d="M-68 18v-36l-108-62v160z"/>
-    </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="SHOT PLANNER logo">
+  <rect width="512" height="512" rx="96" fill="#0b3d91"/>
+  <g transform="translate(256 220)" fill="#ffffff">
+    <circle r="28"/>
+    <path d="M0-116a116 116 0 0 1 53 12l-23.5 40.5A69 69 0 0 0 0-70z"/>
+    <path d="M100.5 58A116 116 0 0 1 0 116V70a69 69 0 0 0 59.8-34.5z"/>
+    <path d="M-100.5 58A116 116 0 0 1-53-104l23.5 40.5A69 69 0 0 0-59.8 34.5z"/>
+    <circle r="11" fill="#0b3d91"/>
   </g>
-  <g fill="#ffffff" font-family="Arial, sans-serif" font-weight="700" text-anchor="middle">
-    <text x="256" y="440" font-size="62">RT</text>
-  </g>
+  <text x="256" y="438" text-anchor="middle" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="66" font-weight="800" letter-spacing="1.6">SHOT PLANNER</text>
 </svg>
