@@ -1184,145 +1184,6 @@
         y += sectionHeight + sectionGap;
       }
 
-      function drawSection5Header() {
-        const headerHeight = 20;
-        const sectionGap = 8;
-        ensureSpace(headerHeight + sectionGap);
-        pdf.setFillColor(0, 102, 204);
-        pdf.rect(marginX + 1, y + 1, contentWidth - 2, headerHeight, "F");
-        pdf.setDrawColor(90, 90, 90);
-        pdf.setLineWidth(1);
-        pdf.roundedRect(marginX, y, contentWidth, headerHeight + 2, 4, 4);
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(11);
-        pdf.setTextColor(255, 255, 255);
-        pdf.text("Section 5 — Shots", marginX + 10, y + 15);
-        pdf.setTextColor(0, 0, 0);
-        y += headerHeight + sectionGap;
-      }
-
-      function getShotCardMetrics(shot) {
-        const cardPaddingX = 10;
-        const cardPaddingTop = 14;
-        const cardPaddingBottom = 10;
-        const lineGap = 12;
-        const rowCount = 5;
-        const rowBlockHeight = rowCount * lineGap;
-        const fullRowSpacing = 6;
-        const sectionGap = 8;
-        const notesValue = String(shot.notes || "").trim() || "-";
-        const figureNote = extractFigureNoteForPdf(shot.figure);
-        const notesRows = buildWrappedRow({ label: "Comparator / Notes: ", value: notesValue }, contentWidth - cardPaddingX * 2);
-        const reminderRows = figureNote ? buildWrappedRow({ label: "Reminder: ", value: figureNote }, contentWidth - cardPaddingX * 2) : [];
-        const notesHeight = notesRows.length * lineGap;
-        const reminderHeight = reminderRows.length * lineGap;
-        const reminderSpacing = reminderRows.length ? fullRowSpacing : 0;
-        const cardHeight = cardPaddingTop + rowBlockHeight + fullRowSpacing + notesHeight + reminderSpacing + reminderHeight + cardPaddingBottom;
-
-        return {
-          cardPaddingX,
-          cardPaddingTop,
-          lineGap,
-          rowBlockHeight,
-          fullRowSpacing,
-          sectionGap,
-          notesRows,
-          reminderRows,
-          notesHeight,
-          reminderSpacing,
-          cardHeight,
-        };
-      }
-
-      function drawShotCard(shot, index) {
-        const result = getShotResult(shot);
-        const shotStatus = result.ug > 0.024 ? "FAIL" : "PASS";
-        const figureNumber = String(shot.figure || "").trim() || "-";
-        const metrics = getShotCardMetrics(shot);
-        const { cardPaddingX, cardPaddingTop, lineGap, rowBlockHeight, fullRowSpacing, sectionGap, notesRows, reminderRows, notesHeight, reminderSpacing, cardHeight } =
-          metrics;
-        const contentLeft = marginX + cardPaddingX;
-        const contentTop = y + cardPaddingTop;
-        const columnGap = 20;
-        const columnWidth = (contentWidth - cardPaddingX * 2 - columnGap) / 2;
-        const leftColX = contentLeft;
-        const rightColX = contentLeft + columnWidth + columnGap;
-        const defaultTextColor = [0, 0, 0];
-
-        const fixedRows = [
-          {
-            left: { label: "Shot #:", value: String(index + 1) },
-            right: { label: "Fig:", value: figureNumber },
-          },
-          {
-            left: { label: "ID:", value: shot.shotId || "-" },
-            right: { label: "Exposure:", value: shot.exposureTime || "-" },
-          },
-          {
-            left: { label: "PDD:", value: `${Number(shot.pdd || 0).toFixed(3)} in` },
-            right: { label: "SPD:", value: `${Number(shot.spd || 0).toFixed(3)} in` },
-          },
-          {
-            left: { label: "UG:", value: result.ug.toFixed(4) },
-            right: {
-              label: "PASS / FAIL:",
-              value: shotStatus,
-              valueColor: shotStatus === "PASS" ? [0, 150, 0] : [200, 0, 0],
-            },
-          },
-          {
-            left: { label: "Req Mult:", value: result.requiredMultiplier > 0 ? `${result.requiredMultiplier}×` : "-" },
-            right: { label: "Rec SPD:", value: `${result.recommendedSpd.toFixed(3)} in` },
-          },
-        ];
-
-        ensureSpace(cardHeight + sectionGap);
-
-        pdf.setDrawColor(90, 90, 90);
-        pdf.setLineWidth(1);
-        pdf.roundedRect(marginX, y, contentWidth, cardHeight, 4, 4);
-
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(9.5);
-        pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
-
-        const drawColumnCell = (cell, startX, lineY) => {
-          const label = `${cell.label} `;
-          pdf.setFont("helvetica", "bold");
-          pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
-          pdf.text(label, startX, lineY);
-          const labelWidth = pdf.getTextWidth(label);
-          pdf.setFont("helvetica", "normal");
-          if (Array.isArray(cell.valueColor)) {
-            pdf.setTextColor(cell.valueColor[0], cell.valueColor[1], cell.valueColor[2]);
-          } else {
-            pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
-          }
-          pdf.text(String(cell.value), startX + labelWidth, lineY, { maxWidth: columnWidth - labelWidth });
-          pdf.setTextColor(defaultTextColor[0], defaultTextColor[1], defaultTextColor[2]);
-        };
-
-        fixedRows.forEach((row, rowIndex) => {
-          const lineY = contentTop + rowIndex * lineGap;
-          drawColumnCell(row.left, leftColX, lineY);
-          drawColumnCell(row.right, rightColX, lineY);
-        });
-
-        let extraY = contentTop + rowBlockHeight + fullRowSpacing;
-        notesRows.forEach((line, lineIndex) => {
-          drawWrappedLine(line, contentLeft, extraY + lineIndex * lineGap);
-        });
-        extraY += notesHeight;
-
-        if (reminderRows.length) {
-          extraY += reminderSpacing;
-          reminderRows.forEach((line, lineIndex) => {
-            drawWrappedLine(line, contentLeft, extraY + lineIndex * lineGap);
-          });
-        }
-        y += cardHeight + sectionGap;
-      }
-
       drawPdfHeader();
 
       drawSection("Section 1 — Job Information", [
@@ -1364,27 +1225,40 @@
       if (shotCards.length === 0) {
         drawSection("Section 5 — Shot Cards", ["No shots entered."]);
       } else {
-        drawSection5Header();
-        let shotsOnCurrentPage = 0;
-        let isFirstShotsPage = true;
-
         shotCards.forEach((shot, index) => {
-          const { cardHeight, sectionGap } = getShotCardMetrics(shot);
-          const maxShotsForPage = isFirstShotsPage ? 1 : 4;
-          const exceedsCountLimit = shotsOnCurrentPage >= maxShotsForPage;
-          const exceedsPageArea = y + cardHeight + sectionGap > maxY;
+          const result = getShotResult(shot);
+          const shotStatus = result.ug > 0.024 ? "FAIL" : "PASS";
 
-          if (exceedsCountLimit || exceedsPageArea) {
-            pdf.addPage();
-            y = topY;
-            drawPdfHeader();
-            drawSection5Header();
-            shotsOnCurrentPage = 0;
-            isFirstShotsPage = false;
+          const figureNumber = String(shot.figure || "").trim() || "-";
+          const figureNote = extractFigureNoteForPdf(shot.figure);
+          const rows = [
+            { label: "Shot number: ", value: String(index + 1) },
+            { label: "Shot ID / Location: ", value: shot.shotId || "-" },
+            { label: "Exposure Time: ", value: shot.exposureTime || "-" },
+            { label: "Fig: ", value: figureNumber },
+            { label: "PDD: ", value: `${Number(shot.pdd || 0).toFixed(3)} in` },
+            { label: "SPD: ", value: `${Number(shot.spd || 0).toFixed(3)} in` },
+            { label: "UG: ", value: result.ug.toFixed(4) },
+            { label: "Required Multiplier: ", value: result.requiredMultiplier > 0 ? `${result.requiredMultiplier}×` : "-" },
+            { label: "Recommended SPD: ", value: `${result.recommendedSpd.toFixed(3)} in` },
+            { label: "PASS / FAIL: ", value: shotStatus, valueColor: shotStatus === "PASS" ? [0, 150, 0] : [200, 0, 0] },
+          ];
+
+          if (String(shot.notes || "").trim()) {
+            rows.push({ label: "COMPARATOR SERIAL NUMBER / NOTES: ", value: shot.notes.trim() });
           }
 
-          drawShotCard(shot, index);
-          shotsOnCurrentPage += 1;
+          if (figureNote) {
+            rows.push(figureNote);
+          }
+
+          drawSection(`Section 5 — Shot ${index + 1}`, rows, {
+            headerHeight: 16,
+            paddingTop: 10,
+            paddingBottom: 8,
+            rowGap: 12,
+            sectionGap: 8,
+          });
         });
       }
 
