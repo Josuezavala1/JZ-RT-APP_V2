@@ -1003,6 +1003,12 @@
 
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ unit: "pt", format: "letter" });
+      const generatedAt = new Date();
+      const padTimestampPart = (value) => String(value).padStart(2, "0");
+      const generatedDateTime = `${generatedAt.getFullYear()}-${padTimestampPart(generatedAt.getMonth() + 1)}-${padTimestampPart(
+        generatedAt.getDate()
+      )} ${padTimestampPart(generatedAt.getHours())}:${padTimestampPart(generatedAt.getMinutes())}`;
+      const generatedTimePart = `${padTimestampPart(generatedAt.getHours())}${padTimestampPart(generatedAt.getMinutes())}`;
       let y = 72;
       const pageBottom = 730;
       const marginX = 40;
@@ -1033,6 +1039,8 @@
         pdf.setTextColor(110, 110, 110);
         pdf.text(`Page ${pageNumber} of ${totalPages}`, pageWidth / 2, pageHeight - 30, { align: "center" });
         pdf.text("Powered by UWC", pageWidth / 2, pageHeight - 20, { align: "center" });
+        pdf.setFontSize(7);
+        pdf.text(`Generated: ${generatedDateTime}`, marginX, pageHeight - 20);
       }
 
       function decodeCriteriaForPdf(text) {
@@ -1287,7 +1295,8 @@
       const drawingPart = sanitizeFilenamePart(dom.drawingNumber.value, "NO-DRAWING");
       const technicianPart = sanitizeFilenamePart(dom.technician.value, "NO-TECH");
       const datePart = sanitizeFilenamePart(dom.jobDate.value, "NO-DATE");
-      const downloadFilename = `${drawingPart}_${technicianPart}_${datePart}.pdf`;
+      const timePart = sanitizeFilenamePart(generatedTimePart, "0000");
+      const downloadFilename = `${drawingPart}_${technicianPart}_${datePart}_${timePart}.pdf`;
 
       pdf.save(downloadFilename);
     }
