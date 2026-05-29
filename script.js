@@ -5,6 +5,7 @@
   const AUTH_USER_STORAGE_KEY = "rt-shot-safety-v2-auth-user";
   const AUTH_VERSION_STORAGE_KEY = "rt-shot-safety-v2-auth-version";
   const AUTH_VERSION = "admin-youare-1";
+  const PROCEDURE_REFERENCE = "CHEV-USA-DR-03P001 Rev. 05";
 
   // Locked isotope constants in mR/hr per Ci @ 1 ft.
   const ISOTOPE_CONSTANTS = {
@@ -274,6 +275,7 @@
       unitSite: document.getElementById("unitSite"),
       jobDate: document.getElementById("jobDate"),
       drawingNumber: document.getElementById("drawingNumber"),
+      procedureReference: document.getElementById("procedureReference"),
       technician: document.getElementById("technician"),
       cameraSerial: document.getElementById("cameraSerial"),
       isotope: document.getElementById("isotope"),
@@ -305,6 +307,10 @@
       warningsList: document.getElementById("warningsList"),
       generatePdfButton: document.getElementById("generatePdfButton"),
     };
+
+    if (dom.procedureReference) {
+      dom.procedureReference.textContent = PROCEDURE_REFERENCE;
+    }
 
     // Backward-compatible aliases for legacy names used throughout this file.
     dom.layersContainer = dom.materials;
@@ -1204,6 +1210,7 @@
       drawSection("Section 1 — Job Information", [
         { label: "Unit / Site: ", value: dom.unitSite.value || "-" },
         { label: "Date: ", value: dom.jobDate.value || "-" },
+        { label: "Procedure Reference: ", value: PROCEDURE_REFERENCE },
         { label: "Drawing Number: ", value: dom.drawingNumber.value || "-" },
         { label: "Technician: ", value: dom.technician.value || "-" },
         { label: "Camera Serial Number: ", value: dom.cameraSerial.value || "-" },

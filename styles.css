@@ -191,6 +191,14 @@ input[readonly] {
   background: #f6f8fc;
 }
 
+.static-field-value {
+  width: 100%;
+  padding: 0.1rem 0;
+  font: inherit;
+  font-weight: 700;
+  color: var(--text);
+}
+
 input:focus,
 select:focus {
   outline: none;
